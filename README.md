@@ -1,2 +1,3 @@
 # DungeonFighter
-DungeonFighter，APRG Game , with unity5.5
+DungeonFighter，APRG Game , with unity5.3.6
+
