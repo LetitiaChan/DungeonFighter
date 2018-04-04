@@ -1,24 +1,6 @@
-﻿/***
- *
- *	Project:“地下守护神” Dungeon Fighter
- *
- *	Title:控制层: 场景异步加载，后台逻辑处理 
- *
- *	Description:
- *		1.
- *
- *	Date:
- *
- *	Version:
- *		1.0
- *
- *	Author:chenx
- *
-*/
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-
 using Kernal;
 using Global;
 
@@ -29,70 +11,57 @@ namespace Control
 
         IEnumerator Start()
         {
-            //Log.Write(GetType() + "/Start()");
             yield return new WaitForSeconds(GlobalParameter.INTERVAL_TIME_0DOT1);
-            //关卡预处理逻辑
             StartCoroutine("ScenesPreProgressing");
-            //垃圾收集
             StartCoroutine("HandleGC");
         }
 
-        //关卡预处理逻辑
         IEnumerator ScenesPreProgressing()
         {
             yield return new WaitForSeconds(GlobalParameter.INTERVAL_TIME_0DOT1);
             switch (GlobalParaMgr.NextSceneName)
             {
-                case EnumScenes.ScenesStart:
+                case Scenes.TestScene:
                     break;
-                case EnumScenes.ScenesLogin:
+                case Scenes.StartScene:
                     break;
-                case EnumScenes.ScenesLoading:
+                case Scenes.LogonScene:
                     break;
-                case EnumScenes.ScenesLevelOne:
-                    //StartCoroutine("ScenesPreProgressing_LevelOne");
+                case Scenes.LevelOne:
+                    //DebugConsole.Log("XML解析 - 1111111111111111111111111");
+                    StartCoroutine("ScenesPreProgressing_LevelOne");
                     break;
-                case EnumScenes.ScenesLevelTwo:
+                case Scenes.LevelTwo:
+                    break;
+                case Scenes.BaseScene:
                     break;
                 default:
                     break;
             }
         }
 
-        ///// <summary>
-        ///// 预处理_第一关卡
-        ///// </summary>
-        ///// <returns></returns>
-        //IEnumerator ScenesPreProgressing_LevelOne()
-        //{
-        //    yield return new WaitForSeconds(GlobalParameter.INTERVAL_TIME_0DOT1);
-        //    //参数赋值。
-        //    XMLDialogsDataAnalysisMgr.GetInstance().SetXMLPathAndRootNodeName(KernalParameter.GetDialogConfigXMLPath(), KernalParameter.GetDialogConfigXMLRootNodeName());
-        //    yield return new WaitForSeconds(GlobalParameter.INTERVAL_TIME_0DOT3);
-        //    //得到XML中所有的数据
-        //    List<DialogDataFormat> liDialogsDataArray = XMLDialogsDataAnalysisMgr.GetInstance().GetAllxmlDataArray();
-        //    //测试给“对话数据管理器”加载数据
-        //    bool booResult = DialogDataMgr.GetInstance().LoadAllDialgData(liDialogsDataArray);
-        //    if (!booResult)
-        //    {
-        //        Log.Write(GetType() + "/Start()/‘对话数据管理器’加载数据失败", Log.Level.High);
-        //    }
-        //}
+        IEnumerator ScenesPreProgressing_LevelOne()
+        {
+            yield return new WaitForSeconds(GlobalParameter.INTERVAL_TIME_0DOT1);
+            //DebugConsole.Log("XML解析 - 2222222222222222222222222");
 
-        /// <summary>
-        ///垃圾资源收集
-        /// </summary>
-        /// <returns></returns>
+            List<DialogDataFormat> dialogsDataArray = XMLDialogsDataAnalysisMgr.GetInstance().GetAllXMLDatas();
+            //DebugConsole.Log("XML解析 - 3333333333333333333333333    " + "dialogsDataArray 存在？ " + (dialogsDataArray == null ? "False" : "True"));
+            //DebugConsole.Log(GetType() + " 对话数据量：" + dialogsDataArray.Count);
+            bool result = DialogDataMgr.GetInstance().LoadAllDialogData(dialogsDataArray);
+            if (!result)
+            {
+                DebugConsole.Log(GetType() + "/ScenesPreProgressing_LevelOne()/‘对话数据管理器’加载数据失败");
+            }
+        }
+
         IEnumerator HandleGC()
         {
             yield return new WaitForSeconds(GlobalParameter.INTERVAL_TIME_0DOT1);
-            //卸载无用的资源
             Resources.UnloadUnusedAssets();
-            //强制垃圾收集
-            System.GC.Collect();
+            System.GC.Collect();  //强制垃圾收集
         }
-
-    }//Class_end
+    }
 }
 
 

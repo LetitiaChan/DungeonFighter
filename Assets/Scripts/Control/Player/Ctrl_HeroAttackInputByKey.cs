@@ -1,49 +1,30 @@
-﻿/***
- *
- *	Project:“地下守护神” Dungeon Fighter
- *
- *	Title:控制层：主角攻击输入，通过键盘方式
- *
- *	Description:
- *		1.
- *
- *	Date:2017.02.22
- *
- *	Version:
- *		1.0
- *
- *	Author:chenx
- *
-*/
-using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
-using System.Collections.Generic;
-
+﻿using UnityEngine;
 using Global;
-using Kernal;
 
 namespace Control
 {
+    /// <summary>
+    /// 主角攻击输入，通过键盘方式
+    /// </summary>
     public class Ctrl_HeroAttackInputByKey : BaseControl
     {
         //#if UNITY_STANDALONE_WIN || UNITY_EDITOR
-        //事件：主角控制
+#if UNITY_STANDALONE_WIN
         public static event del_PlayerControlWithStr evePlayerControl;
 
         void Update()
         {
-            if (Input.GetButtonDown(GlobalParameter.INPUT_MGR_ATTACKNAME_NORMAL))
+            if (Input.GetButton(GlobalParameter.INPUT_MGR_ATTACKNAME_NORMAL))
             {
-                print("NormalAttack J");
                 if (evePlayerControl != null)
                 {
+                    //print("NormalAttack J");
                     evePlayerControl(GlobalParameter.INPUT_MGR_ATTACKNAME_NORMAL);
                 }
             }
             else if (Input.GetButtonDown(GlobalParameter.INPUT_MGR_ATTACKNAME_MAGICTRICK_A))
             {
-                print("MagicTrickA K ");
+                //print("MagicTrickA K ");
                 if (evePlayerControl != null)
                 {
                     evePlayerControl(GlobalParameter.INPUT_MGR_ATTACKNAME_MAGICTRICK_A);
@@ -51,13 +32,13 @@ namespace Control
             }
             else if (Input.GetButtonDown(GlobalParameter.INPUT_MGR_ATTACKNAME_MAGICTRICK_B))
             {
-                print("MagicTrickB L ");
+                //print("MagicTrickB L ");
                 if (evePlayerControl != null)
                 {
                     evePlayerControl(GlobalParameter.INPUT_MGR_ATTACKNAME_MAGICTRICK_B);
                 }
             }
         }
-        //#endif
+#endif
     }
 }

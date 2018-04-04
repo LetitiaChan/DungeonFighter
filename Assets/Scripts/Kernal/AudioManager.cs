@@ -1,81 +1,94 @@
-﻿/***
- * 
- *  插件： 音频管理类
- * 
- *  功能： 项目中音频剪辑统一管理。
- *
- *  作者： 刘国柱
- *
- *  Version： 1.0
- * 
- */
-using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;                                              //泛型集合命名空间
+﻿using UnityEngine;
+using System.Collections.Generic;
 
 namespace Kernal
 {
     public class AudioManager : MonoBehaviour
     {
-        public AudioClip[] AudioClipArray;                                     //剪辑数组
-        public static float AudioBackgroundVolumns = 1F;                       //背景音量
-        public static float AudioEffectVolumns = 1F;                           //音效音量
+        #region Unity Inspector Fields
+        public AudioClip[] AudioClipArray;
+        #endregion
 
-        private static Dictionary<string, AudioClip> _DicAudioClipLib;         //音频库
-        private static AudioSource[] _AudioSourceArray;                        //音频源数组
-        private static AudioSource _AudioSource_BackgroundAudio;               //背景音乐
-        private static AudioSource _AudioSource_AudioEffectA;                  //音效源A
-        private static AudioSource _AudioSource_AudioEffectB;                  //音效源B
+        private static float _AudioBackgroundVolumn = 1f;
+        private static float _AudioEffectVolumn = 1f;
+        private static Dictionary<string, AudioClip> _AudioClipLib;
+        private static AudioSource[] _AudioSourceArray;
+        private static AudioSource _AudioSource_Background;
+        private static AudioSource _AudioSource_EffectA;
+        private static AudioSource _AudioSource_EffectB;
 
-        /// <summary>
-        /// 音效库资源加载
-        /// </summary>
-        void Awake()
+        public static float AudioBackgroundVolumn
         {
-            //音频库加载
-            _DicAudioClipLib = new Dictionary<string, AudioClip>();
-            foreach (AudioClip audioClip in AudioClipArray)
+            get
             {
-                _DicAudioClipLib.Add(audioClip.name, audioClip);
+                return _AudioBackgroundVolumn;
             }
-            //处理音频源
-            _AudioSourceArray = this.GetComponents<AudioSource>();
-            _AudioSource_BackgroundAudio = _AudioSourceArray[0];
-            _AudioSource_AudioEffectA = _AudioSourceArray[1];
-            _AudioSource_AudioEffectB = _AudioSourceArray[2];
 
-            //从数据持久化中得到音量数值
-            if (PlayerPrefs.GetFloat("AudioBackgroundVolumns") >= 0)
+            set
             {
-                AudioBackgroundVolumns = PlayerPrefs.GetFloat("AudioBackgroundVolumns");
-                _AudioSource_BackgroundAudio.volume = AudioBackgroundVolumns;
-            }
-            if (PlayerPrefs.GetFloat("AudioEffectVolumns") >= 0)
-            {
-                AudioEffectVolumns = PlayerPrefs.GetFloat("AudioEffectVolumns");
-                _AudioSource_AudioEffectA.volume = AudioEffectVolumns;
-                _AudioSource_AudioEffectB.volume = AudioEffectVolumns;
+                _AudioBackgroundVolumn = Mathf.Clamp01(value);
+                if (_AudioSource_Background != null)
+                    _AudioSource_Background.volume = _AudioBackgroundVolumn;
+                PlayerPrefs.SetFloat("AudioBackgroundVolumn", _AudioBackgroundVolumn);
             }
         }
 
-        /// <summary>
-        /// 播放背景音乐
-        /// </summary>
-        /// <param name="audioClip">音频剪辑</param>
+        public static float AudioEffectVolumn
+        {
+            get
+            {
+                return _AudioEffectVolumn;
+            }
+
+            set
+            {
+                _AudioEffectVolumn = Mathf.Clamp01(value);
+                if (_AudioSource_EffectA != null)
+                    _AudioSource_EffectA.volume = _AudioEffectVolumn;
+                if (_AudioSource_EffectB != null)
+                    _AudioSource_EffectB.volume = _AudioEffectVolumn;
+                PlayerPrefs.SetFloat("AudioEffectVolumn", _AudioEffectVolumn);
+            }
+        }
+
+        void Awake()
+        {
+            _AudioClipLib = new Dictionary<string, AudioClip>();
+            foreach (AudioClip audioClip in AudioClipArray)
+            {
+                _AudioClipLib.Add(audioClip.name, audioClip);
+            }
+
+            _AudioSourceArray = this.GetComponents<AudioSource>();
+            _AudioSource_Background = _AudioSourceArray[0];
+            _AudioSource_EffectA = _AudioSourceArray[1];
+            _AudioSource_EffectB = _AudioSourceArray[2];
+
+            if (PlayerPrefs.GetFloat("AudioBackgroundVolumn") >= 0)
+            {
+                AudioBackgroundVolumn = PlayerPrefs.GetFloat("AudioBackgroundVolumn");
+            }
+            if (PlayerPrefs.GetFloat("AudioEffectVolumn") >= 0)
+            {
+                AudioEffectVolumn = PlayerPrefs.GetFloat("AudioEffectVolumn");
+            }
+        }
+
         public static void PlayBackground(AudioClip audioClip)
         {
-            //防止背景音乐的重复播放。
-            if (_AudioSource_BackgroundAudio.clip == audioClip)
+            if (_AudioSource_Background == null) return;
+
+            if (_AudioSource_Background.clip == audioClip)
             {
                 return;
             }
-            //处理全局背景音乐音量
-            _AudioSource_BackgroundAudio.volume = AudioBackgroundVolumns;
+
+            _AudioSource_Background.volume = AudioBackgroundVolumn;
             if (audioClip)
             {
-                _AudioSource_BackgroundAudio.loop = true;
-                _AudioSource_BackgroundAudio.clip = audioClip;
-                _AudioSource_BackgroundAudio.Play();
+                _AudioSource_Background.loop = true;
+                _AudioSource_Background.clip = audioClip;
+                _AudioSource_Background.Play();
             }
             else
             {
@@ -83,15 +96,11 @@ namespace Kernal
             }
         }
 
-        /// <summary>
-        /// 播放背景音乐
-        /// </summary>
-        /// <param name="strAudioName"></param>
         public static void PlayBackground(string strAudioName)
         {
             if (!string.IsNullOrEmpty(strAudioName))
             {
-                PlayBackground(_DicAudioClipLib[strAudioName]);
+                PlayBackground(_AudioClipLib[strAudioName]);
             }
             else
             {
@@ -99,19 +108,16 @@ namespace Kernal
             }
         }
 
-        /// <summary>
-        /// 播放音效_音频源A
-        /// </summary>
-        /// <param name="audioClip">音频剪辑</param>
         public static void PlayAudioEffectA(AudioClip audioClip)
         {
-            //处理全局音效音量
-            _AudioSource_AudioEffectA.volume = AudioEffectVolumns;
+            if (_AudioSource_EffectA == null) return;
+
+            _AudioSource_EffectA.volume = AudioEffectVolumn;
 
             if (audioClip)
             {
-                _AudioSource_AudioEffectA.clip = audioClip;
-                _AudioSource_AudioEffectA.Play();
+                _AudioSource_EffectA.clip = audioClip;
+                _AudioSource_EffectA.Play();
             }
             else
             {
@@ -119,19 +125,16 @@ namespace Kernal
             }
         }
 
-        /// <summary>
-        /// 播放音效_音频源B
-        /// </summary>
-        /// <param name="audioClip">音频剪辑</param>
         public static void PlayAudioEffectB(AudioClip audioClip)
         {
-            //处理全局音效音量
-            _AudioSource_AudioEffectB.volume = AudioEffectVolumns;
+            if (_AudioSource_EffectB == null) return;
+
+            _AudioSource_EffectB.volume = AudioEffectVolumn;
 
             if (audioClip)
             {
-                _AudioSource_AudioEffectB.clip = audioClip;
-                _AudioSource_AudioEffectB.Play();
+                _AudioSource_EffectB.clip = audioClip;
+                _AudioSource_EffectB.Play();
             }
             else
             {
@@ -139,15 +142,11 @@ namespace Kernal
             }
         }
 
-        /// <summary>
-        /// 播放音效_音频源A
-        /// </summary>
-        /// <param name="strAudioEffctName">音效名称</param>
         public static void PlayAudioEffectA(string strAudioEffctName)
         {
             if (!string.IsNullOrEmpty(strAudioEffctName))
             {
-                PlayAudioEffectA(_DicAudioClipLib[strAudioEffctName]);
+                PlayAudioEffectA(_AudioClipLib[strAudioEffctName]);
             }
             else
             {
@@ -155,15 +154,11 @@ namespace Kernal
             }
         }
 
-        /// <summary>
-        /// 播放音效_音频源B
-        /// </summary>
-        /// <param name="strAudioEffctName">音效名称</param>
         public static void PlayAudioEffectB(string strAudioEffctName)
         {
             if (!string.IsNullOrEmpty(strAudioEffctName))
             {
-                PlayAudioEffectB(_DicAudioClipLib[strAudioEffctName]);
+                PlayAudioEffectB(_AudioClipLib[strAudioEffctName]);
             }
             else
             {
@@ -171,29 +166,6 @@ namespace Kernal
             }
         }
 
-        /// <summary>
-        /// 改变背景音乐音量
-        /// </summary>
-        /// <param name="floAudioBGVolumns"></param>
-        public static void SetAudioBackgroundVolumns(float floAudioBGVolumns)
-        {
-            _AudioSource_BackgroundAudio.volume = floAudioBGVolumns;
-            AudioBackgroundVolumns = floAudioBGVolumns;
-            //数据持久化
-            PlayerPrefs.SetFloat("AudioBackgroundVolumns", floAudioBGVolumns);
-        }
-
-        /// <summary>
-        /// 改变音效音量
-        /// </summary>
-        /// <param name="floAudioEffectVolumns"></param>
-        public static void SetAudioEffectVolumns(float floAudioEffectVolumns)
-        {
-            _AudioSource_AudioEffectA.volume = floAudioEffectVolumns;
-            _AudioSource_AudioEffectB.volume = floAudioEffectVolumns;
-            AudioEffectVolumns = floAudioEffectVolumns;
-            //数据持久化
-            PlayerPrefs.SetFloat("AudioEffectVolumns", floAudioEffectVolumns);
-        }
     }
 }
+

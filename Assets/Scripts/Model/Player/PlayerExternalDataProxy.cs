@@ -1,40 +1,23 @@
-﻿/***
- *
- *	Project:“地下守护神” Dungeon Fighter
- *
- *	Title:玩家扩展数值代理类
- *
- *	Description:
- *		本质是代理设计模式的应用
- *		本类必须设计为带有构造函数的单例模式
- *
- *	Date:2017.02.25
- *
- *	Version:
- *		1.0
- *
- *	Author:chenx
- *
-*/
-using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
-using System.Collections.Generic;
-
+﻿using UnityEngine;
 using Global;
 
 namespace Model
 {
+    /// <summary>
+    /// 玩家扩展数值代理类
+    /// Description:
+    ///     1> 本质是代理设计模式的应用（本类必须设计为带有构造函数的单例模式）
+    /// </summary>
     public class PlayerExternalDataProxy : PlayerExternalData
     {
-        private static PlayerExternalDataProxy _Instance = null;
+        private static PlayerExternalDataProxy _instance = null;
 
         public PlayerExternalDataProxy(int exp, int killNumber, int level, int gold, int diamonds)
             : base(exp, killNumber, level, gold, diamonds)
         {
-            if (_Instance == null)
+            if (_instance == null)
             {
-                _Instance = this;
+                _instance = this;
             }
             else
             {
@@ -44,9 +27,9 @@ namespace Model
 
         public static PlayerExternalDataProxy GetInstance()
         {
-            if (_Instance != null)
+            if (_instance != null)
             {
-                return _Instance;
+                return _instance;
             }
             else
             {
@@ -56,20 +39,11 @@ namespace Model
         }
 
         #region 经验值
-        /// <summary>
-        /// 增加经验值
-        /// </summary>
-        /// <param name="addExp">经验数值</param>
         public void AddExp(int addExp)
         {
             base.Experience += Mathf.Abs(addExp);
-            //经验值到达一定阶段 升级 
             UpgradeRule.GetInstance().UpgradeCondition(base.Experience);
         }
-        /// <summary>
-        /// 得到经验值
-        /// </summary>
-        /// <returns></returns>
         public int GetExp()
         {
             return base.Experience;
@@ -77,17 +51,10 @@ namespace Model
         #endregion
 
         #region 杀敌数量
-        /// <summary>
-        /// 增加杀敌数量
-        /// </summary>
         public void AddKillNumber()
         {
             ++base.KillNumber;
         }
-        /// <summary>
-        /// 得到杀敌数量
-        /// </summary>
-        /// <returns></returns>
         public int GetKillNumber()
         {
             return base.KillNumber;
@@ -95,19 +62,11 @@ namespace Model
         #endregion
 
         #region 等级
-        /// <summary>
-        /// 增加等级
-        /// </summary>
         public void AddLevel()
         {
             ++base.Level;
-            //等级提升，属性提升
             UpgradeRule.GetInstance().UpgradeOperation((LevelName)base.Level);
         }
-        /// <summary>
-        /// 得到等级
-        /// </summary>
-        /// <returns></returns>
         public int GetLevel()
         {
             return base.Level;
@@ -115,18 +74,20 @@ namespace Model
         #endregion
 
         #region 金币
-        /// <summary>
-        /// 增加金币
-        /// </summary>
-        /// <param name="goldNumber"></param>
         public void AddGold(int goldNumber)
         {
             base.Gold += Mathf.Abs(goldNumber);
         }
-        /// <summary>
-        /// 得到金币
-        /// </summary>
-        /// <returns></returns>
+
+        public bool SubGold(int num)
+        {
+            if (base.Gold - Mathf.Abs(num) >= 0)
+            {
+                base.Gold -= Mathf.Abs(num);
+                return true;
+            }
+            return false;
+        }
         public int GetGold()
         {
             return base.Gold;
@@ -134,26 +95,25 @@ namespace Model
         #endregion
 
         #region 钻石
-        /// <summary>
-        /// 增加钻石
-        /// </summary>
         public void AddDiamonds(int diamondNumber)
         {
             base.Diamonds += Mathf.Abs(diamondNumber);
         }
-        /// <summary>
-        /// 得到钻石
-        /// </summary>
-        /// <returns></returns>
+        public bool SubDiamonds(int num)
+        {
+            if (base.Diamonds - Mathf.Abs(num) >= 0)
+            {
+                base.Diamonds -= Mathf.Abs(num);
+                return true;
+            }
+            return false;
+        }
         public int GetDiamonds()
         {
             return base.Diamonds;
         }
         #endregion
 
-        /// <summary>
-        /// 显示所有初始数值
-        /// </summary>
         public void DisplayAllOriginalValues()
         {
             base.Experience = base.Experience;

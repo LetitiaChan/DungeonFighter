@@ -1,30 +1,4 @@
-﻿/***
- *
- *	Project:“地下守护神” Dungeon Fighter
- *
- *	Title:主角攻击
- *
- *	Description:
- *		攻击动作实现脚本调用：Ctrl_HeroAttackInput -> Ctrl_HeroAttack -> Ctrl_HeroAnimationCtrl
- *		
- *		
- *		开发思路：
- *		1.把附近的所有敌人放入“敌人数组”
- *		    1.1 得到所有敌人，放入“敌人集合”
- *		    1.2 判断“敌人集合”，找出最近敌人
- *		2.主角在一定范围内，开始自动“注视”最近的敌人
- *		3.响应输入攻击信号，对于主角“正面”的敌人给与一定伤害处理
- *
- *	Date:2017.02.22
- *
- *	Version:
- *		1.0
- *
- *	Author:chenx
- *
-*/
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -33,29 +7,45 @@ using Kernal;
 
 namespace Control
 {
+    /// <summary>
+    /// 实现主角攻击    攻击动作实现脚本调用：Ctrl_HeroAttackInput -> Ctrl_HeroAttack -> Ctrl_HeroAnimationCtrl
+    /// 开发思路：
+    ///     1.把附近的所有敌人放入“敌人数组”
+    ///         1.1 得到所有敌人，放入“敌人集合”
+    ///         1.2 判断“敌人集合”，找出最近敌人
+    ///     2.主角在一定范围内，开始自动“注视”最近的敌人
+    ///     3.响应输入攻击信号，对于主角“正面”的敌人给与一定伤害处理
+    /// </summary>
     public class Ctrl_HeroAttack : BaseControl
     {
-        public float FloMinAttackDistance = 5;                                 //最小攻击距离（关注）
-        public float FloHeroRotationSpeed = 1F;                                //主角旋转速率
-        public float FloRealAttackArea = 2F;                                   //主角实际有效攻击距离
+        public float minAttackDistance = 5;
+        public float heroRotationSpeed = 1f;
+        public float realAttackArea = 2f;
         //关于大招攻击参数定义
-        public float FloAttackAreaByMagicA = 4F;                               //大招A的攻击范围
-        public float FloAttackAreaByMagicB = 8F;                               //大招B的攻击范围
-        public int IntAttackPowerMultipleByMagicA = 5;                         //大招A的攻击力倍率
-        public int IntAttackPowerMultipleByMagicB = 20;                        //大招B的攻击力倍率
+        public float attackAreaByMagicA = 4f;
+        public float attackAreaByMagicB = 8f;
+        public float attackAreaByMagicC = 8f;
+        public float attackAreaByMagicD = 4f;
+        public int attackPowerMultipleByMagicA = 2;
+        public int attackPowerMultipleByMagicB = 5;
+        public int attackPowerMultipleByMagicC = 10;
+        public int attackPowerMultipleByMagicD = 10;
 
-        private List<GameObject> _ListEnemys;                                  //敌人集合
-        private Transform _TraNearestEnemy;                                    //最近敌人方位
-        private float _FloMaxDistance = 10;                                    //敌我最大距离（放入“敌人数组”）
+
+        private List<GameObject> _enemys;
+        private Transform _nearestEnemy;
+        private float _maxDistance = 10;
+
 
         void Awake()
         {
             //事件注册:（多播委托） 主角攻击输入（键盘的事件）
             //#if UNITY_STANDALONE_WIN || UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
             Ctrl_HeroAttackInputByKey.evePlayerControl += ResponseNormalAttack;
             Ctrl_HeroAttackInputByKey.evePlayerControl += ResponseMagicTrickA;
             Ctrl_HeroAttackInputByKey.evePlayerControl += ResponseMagicTrickB;
-            //#endif
+#endif
             //主角攻击输入（虚拟按键的事件）
             //#if UNITY_ANDROID || UNITY_IPHONE
             Ctrl_HeroAttackInputByET.evePlayerControl += ResponseNormalAttack;
@@ -68,23 +58,17 @@ namespace Control
 
         void Start()
         {
-            _ListEnemys = new List<GameObject>();
+            _enemys = new List<GameObject>();
             StartCoroutine("RecordNearbyEnemysToArray");
             StartCoroutine("HeroRotationEnemy");
         }
 
         #region 响应攻击输入
-        /// <summary>
-        /// 响应普通攻击
-        /// </summary>
-        /// <param name="controlType"></param>
         public void ResponseNormalAttack(string controlType)
         {
             if (controlType == "NormalAttack")
             {
-                //播放攻击动画
                 Ctrl_HeroAnimationCtrl.Instance.SetCurrentActionState(HeroActionState.NormalAttack);
-                //给特定敌人以伤害处理
                 //if (UnityHelper.GetInstance().GetSmallTime(GlobalParameter.INTEVRAL_TIME_0DOT1))
                 {
                     AttackEnemyByNormal();
@@ -92,67 +76,47 @@ namespace Control
             }
         }
 
-        /// <summary>
-        /// 响应大招A
-        /// </summary>
         public void ResponseMagicTrickA(string controlType)
         {
             if (controlType == "MagicTrickA")
             {
-                //播放攻击动画
                 Ctrl_HeroAnimationCtrl.Instance.SetCurrentActionState(HeroActionState.MagicTrickA);
 
-                //给特定敌人以伤害处理
                 StartCoroutine("AttackEnemyByMagicA");
             }
         }
 
-        /// <summary>
-        /// 响应大招B
-        /// </summary>
         public void ResponseMagicTrickB(string controlType)
         {
             if (controlType == "MagicTrickB")
             {
-                //播放攻击动画
                 Ctrl_HeroAnimationCtrl.Instance.SetCurrentActionState(HeroActionState.MagicTrickB);
 
-                //给特定敌人以伤害处理
+                StartCoroutine("AttackEnemyByMagicB");
             }
         }
 
-        /// <summary>
-        /// 响应大招C
-        /// </summary>
         public void ResponseMagicTrickC(string controlType)
         {
             if (controlType == "MagicTrickC")
             {
-                //播放攻击动画
                 Ctrl_HeroAnimationCtrl.Instance.SetCurrentActionState(HeroActionState.MagicTrickC);
 
-                //给特定敌人以伤害处理
+                StartCoroutine("AttackEnemyByMagicC");
             }
         }
 
-        /// <summary>
-        /// 响应大招D
-        /// </summary>
         public void ResponseMagicTrickD(string controlType)
         {
             if (controlType == "MagicTrickD")
             {
-                //播放攻击动画
                 Ctrl_HeroAnimationCtrl.Instance.SetCurrentActionState(HeroActionState.MagicTrickD);
 
-                //给特定敌人以伤害处理
+                StartCoroutine("AttackEnemyByMagicD");
             }
         }
         #endregion
 
-        /// <summary>
-        /// 把附近敌人放入“敌人数组”
-        /// </summary>
         IEnumerator RecordNearbyEnemysToArray()
         {
             while (true)
@@ -163,78 +127,55 @@ namespace Control
             }
         }
 
-        /// <summary>
-        /// 得到所有(活着的)敌人，放入“敌人集合”
-        /// </summary>
         private void GetEnemysToArray()
         {
             GameObject[] goEnemys = GameObject.FindGameObjectsWithTag(Tag.Tag_Enemys);
-            _ListEnemys.Clear();
+            _enemys.Clear();
             foreach (GameObject goItem in goEnemys)
             {
-                //判断敌人是否存活
-                //Ctrl_Enemy enemy = goItem.GetComponent<Ctrl_Enemy>();
-                //if (enemy && enemy.IsAlive)
-                Ctrl_Warrior_Property enemy = goItem.GetComponent<Ctrl_Warrior_Property>();
+                Ctrl_BaseEnemyProperty enemy = goItem.GetComponent<Ctrl_BaseEnemyProperty>();
                 if (enemy && enemy.CurrentState != EnemyState.Dead)
                 {
-                    _ListEnemys.Add(goItem);
+                    _enemys.Add(goItem);
                 }
             }
         }
 
-        /// <summary>
-        /// 判断“敌人集合”，找最近敌人
-        /// </summary>
         private void GetNearestEnemy()
         {
-            if (_ListEnemys != null && _ListEnemys.Count >= 1)
+            if (_enemys != null && _enemys.Count >= 1)
             {
-                foreach (GameObject goEnemy in _ListEnemys)
+                foreach (GameObject goEnemy in _enemys)
                 {
-                    float floDistance = Vector3.Distance(this.gameObject.transform.position, goEnemy.transform.position);
-                    if (floDistance < _FloMaxDistance)
+                    float floDistance = Vector3.Distance(transform.position, goEnemy.transform.position);
+                    if (floDistance < _maxDistance)
                     {
-                        _FloMaxDistance = floDistance;
-                        _TraNearestEnemy = goEnemy.transform;
+                        _maxDistance = floDistance;
+                        _nearestEnemy = goEnemy.transform;
                     }
                 }
             }
         }
 
-        /// <summary>
-        /// 主角“注视”最近的敌人
-        /// </summary>
-        /// <returns></returns>
         IEnumerator HeroRotationEnemy()
         {
             while (true)
             {
                 yield return new WaitForSeconds(GlobalParameter.INTERVAL_TIME_0DOT5);
-                if (_TraNearestEnemy != null && Ctrl_HeroAnimationCtrl.Instance.CurrentActionState == HeroActionState.Idle)
+                if (_nearestEnemy != null && Ctrl_HeroAnimationCtrl.Instance.CurrentActionState == HeroActionState.Idle)
                 {
-                    float floDistance = Vector3.Distance(this.gameObject.transform.position, _TraNearestEnemy.position);
-                    if (floDistance < FloMinAttackDistance)
+                    float floDistance = Vector3.Distance(transform.position, _nearestEnemy.position);
+                    if (floDistance < minAttackDistance)
                     {
-                        //this.transform.LookAt(_TraNearestEnemy); //LookAt角度有问题，采用注视旋转
-                        //(被替代)
-                        //this.transform.rotation = Quaternion.Slerp(
-                        //    this.transform.rotation,
-                        //    Quaternion.LookRotation(new Vector3(_TraNearestEnemy.position.x, 0, _TraNearestEnemy.position.z) -
-                        //        new Vector3(this.gameObject.transform.position.x, 0, this.gameObject.transform.position.z)),
-                        //    FloHeroRotationSpeed);
-                        UnityHelper.GetInstance().FaceToGoal(this.gameObject.transform, _TraNearestEnemy, FloHeroRotationSpeed);
+                        UnityHelper.GetInstance().FaceToGoal(transform, _nearestEnemy, heroRotationSpeed);
                     }
                 }
             }
         }
 
-        /// <summary>
-        /// 普攻
-        /// </summary>
         private void AttackEnemyByNormal()
         {
-            base.AttackEnemy(_ListEnemys, _TraNearestEnemy, FloRealAttackArea, 1, true);
+            AttackEnemy(_enemys, _nearestEnemy, realAttackArea, 1);
         }
 
         /// <summary>
@@ -244,7 +185,7 @@ namespace Control
         IEnumerator AttackEnemyByMagicA()
         {
             yield return new WaitForSeconds(GlobalParameter.INTERVAL_TIME_1);
-            base.AttackEnemy(_ListEnemys, _TraNearestEnemy, FloAttackAreaByMagicA, IntAttackPowerMultipleByMagicA, false);
+            AttackEnemy(_enemys, _nearestEnemy, attackAreaByMagicA, attackPowerMultipleByMagicA, false);
         }
 
         /// <summary>
@@ -254,8 +195,76 @@ namespace Control
         IEnumerator AttackEnemyByMagicB()
         {
             yield return new WaitForSeconds(GlobalParameter.INTERVAL_TIME_1);
-            base.AttackEnemy(_ListEnemys, _TraNearestEnemy, FloAttackAreaByMagicB, IntAttackPowerMultipleByMagicB);
+            AttackEnemy(_enemys, _nearestEnemy, attackAreaByMagicB, attackPowerMultipleByMagicB);
         }
 
+        /// <summary>
+        /// 使用大招C，攻击敌人
+        /// 功能： 主角周边范围，都造成一定的伤害
+        /// </summary>
+        IEnumerator AttackEnemyByMagicC()
+        {
+            yield return new WaitForSeconds(GlobalParameter.INTERVAL_TIME_1);
+            AttackEnemy(_enemys, _nearestEnemy, attackAreaByMagicC, attackPowerMultipleByMagicC, false);
+        }
+
+        /// <summary>
+        /// 使用大招D，攻击敌人
+        /// 功能： 主角周边范围，都造成一定的伤害
+        /// </summary>
+        IEnumerator AttackEnemyByMagicD()
+        {
+            yield return new WaitForSeconds(GlobalParameter.INTERVAL_TIME_1);
+            AttackEnemy(_enemys, _nearestEnemy, attackAreaByMagicD, attackPowerMultipleByMagicD, false);
+        }
+
+
+        /// <summary>
+        /// 公共方法：攻击敌人
+        /// </summary>
+        /// <param name="attackArea">攻击范围</param>
+        /// <param name="attackPowerMultiple">攻击力度（倍率）</param>
+        /// <param name="isDirection">攻击是否有方向性</param>
+        void AttackEnemy(List<GameObject> lisEnemys, Transform traNearestEnemy, float attackArea, int attackPowerMultiple, bool isDirection = true)
+        {
+            if (lisEnemys == null || lisEnemys.Count <= 0)
+            {
+                traNearestEnemy = null;
+                return;
+            }
+
+            //print("RealATK = " + Ctrl_HeroProperty.Instance.GetCurrentATK() + ", Multiple = " + attackPowerMultiple);
+            foreach (GameObject enemyItem in lisEnemys)
+            {
+                if (enemyItem && enemyItem.GetComponent<Ctrl_BaseEnemyProperty>())
+                {
+                    if (enemyItem.GetComponent<Ctrl_BaseEnemyProperty>().CurrentState != EnemyState.Dead)
+                    {
+                        var distance = Vector3.Distance(transform.position, enemyItem.transform.position);
+                        //攻击具有方向性
+                        if (isDirection)
+                        {
+                            var dir = (enemyItem.transform.position - transform.position).normalized;
+                            var direction = Vector3.Dot(dir, transform.forward);
+                            //如果主角与敌人在同一个方向，且在有效攻击范围内，则对敌人做伤害处理
+                            if (direction > 0 && distance <= attackArea)
+                            {
+                                var hurtValue = Ctrl_HeroProperty.Instance.GetCurrentATK() * attackPowerMultiple;
+                                enemyItem.SendMessage("OnHurt", hurtValue, SendMessageOptions.DontRequireReceiver);
+                            }
+                        }
+                        //攻击无方向性
+                        else
+                        {
+                            if (distance <= attackArea)
+                            {
+                                var hurtValue = Ctrl_HeroProperty.Instance.GetCurrentATK() * attackPowerMultiple;
+                                enemyItem.SendMessage("OnHurt", hurtValue, SendMessageOptions.DontRequireReceiver);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

@@ -1,42 +1,27 @@
-﻿/***
- *
- *	Project:“地下守护神” Dungeon Fighter
- *
- *	Title:玩家核心数值代理类
- *
- *	Description:
- *		本质是代理设计模式的应用
- *		本类必须设计为带有构造函数的单例模式
- *		作用：数据的生成与复杂计算
- *
- *	Date:2017.02.24
- *
- *	Version:
- *		1.0
- *
- *	Author:chenx
- *
-*/
-using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
-using System.Collections.Generic;
+﻿using UnityEngine;
 
 namespace Model
 {
+    /// <summary>
+    /// 玩家核心数值代理类
+    /// Description:
+    ///     1> 作用：数据的生成与复杂计算
+    ///         本质是代理设计模式的应用
+    ///         本类必须设计为带有构造函数的单例模式
+    /// </summary>
     public class PlayerKernalDataProxy : PlayerKernalData
     {
-        private static PlayerKernalDataProxy _Instance = null;
-        public const int ENEMY_MIN_ATK = 1;//敌人最低攻击力
+        private static PlayerKernalDataProxy _instance = null;
+        public const int ENEMY_MIN_ATK = 1;
 
         public PlayerKernalDataProxy(float health, float magic, float ATK, float DEF, float DEX,
                 float maxHealth, float maxMagic, float maxATK, float maxDEF, float maxDEX,
                 float ATKByProp, float DEFByProp, float DEXByProp)
             : base(health, magic, ATK, DEF, DEX, maxHealth, maxMagic, maxATK, maxDEF, maxDEX, ATKByProp, DEFByProp, DEXByProp)
         {
-            if (_Instance == null)
+            if (_instance == null)
             {
-                _Instance = this;
+                _instance = this;
             }
             else
             {
@@ -46,80 +31,48 @@ namespace Model
 
         public static PlayerKernalDataProxy GetInstance()
         {
-            if (_Instance != null)
+            if (_instance != null)
             {
-                return _Instance;
+                return _instance;
             }
             else
             {
-                Debug.LogWarning("/GetInstance()/请先调用构造函数");
+                Debug.LogWarning("PlayerKernalDataProxy/GetInstance()/请先调用构造函数");
                 return null;
             }
         }
 
         #region 生命数值操作
-        /// <summary>
-        /// 减少生命数值
-        /// 公式：_Health = _Health-（敌人攻击力-主角防御力-主角武器防御力）
-        /// </summary>
-        /// <param name="enemyAttackValue">敌人攻击力</param>
         public void DecreaseHealthValues(float enemyAttackValue)
         {
-            float enemyReallyATK = 0F;
-            enemyReallyATK = enemyAttackValue - base.Defence - base.DefenceByProp;
+            // 公式：_Health = _Health-（敌人攻击力-主角防御力-主角武器防御力）
+            var enemyReallyATK = enemyAttackValue - base.Defence - base.DefenceByProp;
+            enemyReallyATK = enemyReallyATK > 0 ? enemyReallyATK : ENEMY_MIN_ATK;
+            base.Health = base.Health - enemyReallyATK > 0 ? Mathf.RoundToInt(base.Health - enemyReallyATK) : 0;
 
-            if (enemyReallyATK > 0)
-            {
-                base.Health -= enemyReallyATK;
-            }
-            else
-            {
-                base.Health -= ENEMY_MIN_ATK;
-            }
-
-            //更新攻击力、防御力、敏捷度
             this.UpdateATKValues();
             this.UpdateDEFValues();
             this.UpdateDEXValues();
         }
-        /// <summary>
-        /// 增加生命数值
-        /// </summary>
-        /// <param name="healthValue"></param>
         public void IncreaseHealthValues(float healthValue)
         {
-            float floReallyIncreseHealth = 0F;
-            floReallyIncreseHealth = base.Health + healthValue;
-            if (floReallyIncreseHealth < base.MaxHealth)
-            {
-                base.Health += healthValue;
-            }
-            else
-            {
-                base.Health = base.MaxHealth;
-            }
+            var resHealth = base.Health + Mathf.Abs(healthValue);
+            resHealth = resHealth < base.MaxHealth ? resHealth : base.MaxHealth;
+            base.Health = Mathf.RoundToInt(resHealth);
+
+            this.UpdateATKValues();
+            this.UpdateDEFValues();
+            this.UpdateDEXValues();
         }
-        /// <summary>
-        /// 得到生命数值
-        /// </summary>
-        /// <returns></returns>
         public float GetCurrentHealth()
         {
             return base.Health;
         }
 
-        /// <summary>
-        /// 增加最大生命数值
-        /// </summary>
-        /// <param name="increaseHealth">增量</param>
         public void IncreaseMaxHealth(float increaseHealth)
         {
-            base.MaxHealth += Mathf.Abs(increaseHealth);
+            base.MaxHealth = Mathf.RoundToInt(base.MaxHealth + Mathf.Abs(increaseHealth));
         }
-        /// <summary>
-        /// 得到最大生命数值
-        /// </summary>
-        /// <returns></returns>
         public float GetMaxHealth()
         {
             return base.MaxHealth;
@@ -127,59 +80,27 @@ namespace Model
         #endregion
 
         #region 魔法数值操作
-        /// <summary>
-        /// 减少魔法数值
-        /// 公式：_Magic = _Magic - ( 释放一次“特定魔法”的损耗 )
-        /// </summary>
-        /// <param name="magicValue">魔法数值损耗</param>
         public void DecreaseMagicValues(float magicValue)
         {
-            float reallyMagicValuesResult = 0F;//实际的剩余魔法数值
-            reallyMagicValuesResult = base.Magic - magicValue;
-
-            if (reallyMagicValuesResult > 0)
-            {
-                base.Magic -= Mathf.Abs(magicValue);
-            }
-            else
-            {
-                base.Magic = 0;
-            }
+            // 公式：_Magic = _Magic - ( 释放一次“特定魔法”的损耗 )
+            var resMagic = base.Magic - Mathf.Abs(magicValue);
+            resMagic = resMagic > 0 ? resMagic : 0;
+            base.Magic = Mathf.RoundToInt(resMagic);
         }
-        /// <summary>
-        /// 增加魔法数值
-        /// </summary>
-        /// <param name="MagicValue"></param>
         public void IncreaseMagicValues(float MagicValue)
         {
-            float floReallyIncreseMagic = 0F;
-
-            floReallyIncreseMagic = base.Magic + MagicValue;
-            if (floReallyIncreseMagic < base.MaxMagic)
-            {
-                base.Magic += MagicValue;
-            }
-            else
-            {
-                base.Magic = base.MaxMagic;
-            }
+            var resMagic = base.Magic + MagicValue;
+            resMagic = resMagic < base.MaxMagic ? resMagic : base.MaxMagic;
+            base.Magic = Mathf.RoundToInt(resMagic);
         }
         public float GetCurrentMagic()
         {
             return base.Magic;
         }
-        /// <summary>
-        /// 增加最大魔法值
-        /// </summary>
-        /// <param name="increaseMagic"></param>
         public void IncreaseMaxMagic(float increaseMagic)
         {
-            base.MaxMagic += Mathf.Abs(increaseMagic);
+            base.MaxMagic = Mathf.RoundToInt(base.MaxMagic + Mathf.Abs(increaseMagic));
         }
-        /// <summary>
-        /// 得到最大魔法值
-        /// </summary>
-        /// <returns></returns>
         public float GetMaxMagic()
         {
             return base.MaxMagic;
@@ -187,54 +108,28 @@ namespace Model
         #endregion
 
         #region 攻击力数值操作
-        /// <summary>
-        /// 更新攻击力（典型应用场景：主角健康值改变；取得新武器）
-        /// 公式：_AttackForce=MaxATK/2*(_Health/MaxHealth)+[“武器攻击力”]
-        /// </summary>
-        /// <param name="newWeaponValues">新武器数值</param>
         public void UpdateATKValues(float newWeaponValues = 0)
         {
-            float reallyATKValues = 0F;//实际的攻击数值
+            // 公式：_AttackForce=MaxATK/2*(_Health/MaxHealth)+[“武器攻击力”]
+            var reallyATKValues = 0f;
 
-            if (newWeaponValues == 0)//没有获取新的武器道具
-            {
-                reallyATKValues = base.MaxAttack / 2 * (base.Health / base.MaxHealth) + base.AttackByProp;
-            }
-            else if (newWeaponValues > 0)//取得武器道具
+            if (newWeaponValues > 0)
             {
                 base.AttackByProp = newWeaponValues;
-                reallyATKValues = base.MaxAttack / 2 * (base.Health / base.MaxHealth) + base.AttackByProp;
             }
-            //数值有效性验证
-            if (reallyATKValues > base.MaxAttack)
-            {
-                base.Attack = base.MaxAttack;
-            }
-            else
-            {
-                base.Attack = reallyATKValues;
-            }
+            reallyATKValues = base.MaxAttack / 2 * (base.Health / base.MaxHealth) + base.AttackByProp;
+            reallyATKValues = reallyATKValues > base.MaxAttack ? base.MaxAttack : reallyATKValues;
+
+            base.Attack = Mathf.RoundToInt(reallyATKValues);
         }
-        /// <summary>
-        /// 得到当前攻击力
-        /// </summary>
-        /// <returns></returns>
         public float GetCurrentATK()
         {
             return base.Attack;
         }
-        /// <summary>
-        /// 增加最大攻击力
-        /// </summary>
-        /// <param name="increaseATK"></param>
         public void IncreaseMaxATK(float increaseATK)
         {
-            base.MaxAttack += Mathf.Abs(increaseATK);
+            base.MaxAttack = Mathf.RoundToInt(base.MaxAttack + Mathf.Abs(increaseATK));
         }
-        /// <summary>
-        /// 得到最大攻击力
-        /// </summary>
-        /// <returns></returns>
         public float GetMaxATK()
         {
             return base.MaxAttack;
@@ -242,54 +137,33 @@ namespace Model
         #endregion
 
         #region 防御力数值操作
-        /// <summary>
-        /// 更新防御力（典型应用场景：主角健康值改变；取得新武器）
-        /// 公式：_Defence=MaxDEF/2*(_Health/MaxHealth)+[武器防御力]
-        /// </summary>
-        /// <param name="newWeaponDEFValues">新防御武器数值</param>
         public void UpdateDEFValues(float newWeaponDEFValues = 0)
         {
-            float reallyDEFValues = 0F;//实际的攻击数值
+            // 公式：_Defence=MaxDEF/2*(_Health/MaxHealth)+[武器防御力]
 
-            if (newWeaponDEFValues == 0)//没有获取新的武器道具
+            float reallyDEFValues = 0F;
+
+            if (newWeaponDEFValues == 0)
             {
                 reallyDEFValues = base.MaxDefence / 2 * (base.Health / base.MaxHealth) + base.DefenceByProp;
             }
-            else if (newWeaponDEFValues > 0)//取得武器道具
+            else if (newWeaponDEFValues > 0)
             {
                 base.DefenceByProp = newWeaponDEFValues;
                 reallyDEFValues = base.MaxDefence / 2 * (base.Health / base.MaxHealth) + base.DefenceByProp;
             }
-            //数值有效性验证
-            if (reallyDEFValues > base.MaxDefence)
-            {
-                base.Defence = base.MaxDefence;
-            }
-            else
-            {
-                base.Defence = reallyDEFValues;
-            }
+            reallyDEFValues = (reallyDEFValues > base.MaxDefence) ? base.MaxDefence : reallyDEFValues;
+
+            base.Defence = Mathf.RoundToInt(reallyDEFValues);
         }
-        /// <summary>
-        /// 得到当前防御力
-        /// </summary>
-        /// <returns></returns>
         public float GetCurrentDEF()
         {
             return base.Defence;
         }
-        /// <summary>
-        /// 增加最大防御力
-        /// </summary>
-        /// <param name="increaseDEF"></param>
         public void IncreaseMaxDEF(float increaseDEF)
         {
-            base.MaxDefence += Mathf.Abs(increaseDEF);
+            base.MaxDefence = Mathf.RoundToInt(base.MaxDefence + Mathf.Abs(increaseDEF));
         }
-        /// <summary>
-        /// 得到最大防御力
-        /// </summary>
-        /// <returns></returns>
         public float GetMaxDEF()
         {
             return base.MaxDefence;
@@ -297,76 +171,52 @@ namespace Model
         #endregion
 
         #region 敏捷度数值操作
-        /// <summary>
-        /// 更新敏捷度（典型应用场景：主角健康值改变；防御力改变；取得新武器）
-        /// 公式：_MoveSpeed=MaxMoveSpeed/2*(_Health/MaxHealth)-_Defence+[道具敏捷力]
-        /// </summary>
-        /// <param name="newWeaponValues">新武器数值</param>
         public void UpdateDEXValues(float newWeaponValues = 0)
         {
-            float reallyDEXValues = 0F;//实际的敏捷度数值
+            // 公式：_MoveSpeed=MaxMoveSpeed/2*(_Health/MaxHealth)-_Defence+[道具敏捷力]
 
-            if (newWeaponValues == 0)//没有获取新的武器道具
+            float reallyDEXValues = 0f;
+
+            if (newWeaponValues == 0)
             {
                 reallyDEXValues = base.MaxDexterity / 2 * (base.Health / base.MaxHealth) - base.Defence + base.DexterityByProp;
             }
-            else if (newWeaponValues > 0)//取得武器道具
+            else if (newWeaponValues > 0)
             {
                 base.DexterityByProp = newWeaponValues;
                 reallyDEXValues = base.MaxDexterity / 2 * (base.Health / base.MaxHealth) - base.Defence + base.DexterityByProp;
             }
-            //数值有效性验证
-            if (reallyDEXValues > base.MaxDexterity)
-            {
-                base.Dexterity = base.MaxDexterity;
-            }
-            else
-            {
-                base.Dexterity = reallyDEXValues;
-            }
+            reallyDEXValues = (reallyDEXValues > base.MaxDexterity) ? base.MaxDexterity : reallyDEXValues;
+
+            base.Dexterity = Mathf.RoundToInt(reallyDEXValues);
         }
-        /// <summary>
-        /// 得到当前敏捷度
-        /// </summary>
-        /// <returns></returns>
         public float GetCurrentDEX()
         {
             return base.Dexterity;
         }
-        /// <summary>
-        /// 增加最大敏捷度
-        /// </summary>
-        /// <param name="increaseDEX"></param>
         public void IncreaseMaxDEX(float increaseDEX)
         {
-            base.MaxDexterity += Mathf.Abs(increaseDEX);
+            base.MaxDexterity = Mathf.RoundToInt(base.MaxDexterity + Mathf.Abs(increaseDEX));
         }
-        /// <summary>
-        /// 得到最大敏捷度
-        /// </summary>
-        /// <returns></returns>
         public float GetMaxDEX()
         {
             return base.MaxDexterity;
         }
         #endregion
 
-        /// <summary>
-        /// 显示所有的初始值
-        /// </summary>
         public void DisplayerAllOriginalValues()
         {
-            base.Health = base.Health;
-            base.Magic = base.Magic;
-            base.Attack = base.Attack;
-            base.Defence = base.Defence;
-            base.Dexterity = base.Dexterity;
-
             base.MaxHealth = base.MaxHealth;
             base.MaxMagic = base.MaxMagic;
             base.MaxAttack = base.MaxAttack;
             base.MaxDefence = base.MaxDefence;
             base.MaxDexterity = base.MaxDexterity;
+
+            base.Health = base.Health;
+            base.Magic = base.Magic;
+            base.Attack = base.Attack;
+            base.Defence = base.Defence;
+            base.Dexterity = base.Dexterity;
 
             base.AttackByProp = base.AttackByProp;
             base.DefenceByProp = base.DefenceByProp;

@@ -1,24 +1,6 @@
-﻿/***
- *
- *	Project:“地下守护神” Dungeon Fighter
- *
- *	Title:控制层 - 父类控制层
- *
- *	Description:
- *		1.控制层脚本中公共的部分，在本脚本继承
- *
- *	Date:2017.02.20
- *
- *	Version:
- *		1.0
- *
- *	Author:chenx
- *
-*/
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
-using System.Collections.Generic;
 using Global;
 using Kernal;
 
@@ -26,101 +8,130 @@ namespace Control
 {
     public class BaseControl : MonoBehaviour
     {
-
-        /// <summary>
-        /// 进入下一个场景
-        /// </summary>
-        /// <param name="sceneName">场景（枚举）名称</param>
-        protected void EnterNextScene(EnumScenes sceneName)
+        protected void EnterNextScenes(Global.Scenes scenesEnumName)
         {
-            GlobalParaMgr.NextSceneName = sceneName;
-            Application.LoadLevel(ConvertEnumToStr.GetInstance().GetStrByEnumScenes(GlobalParaMgr.NextSceneName));
+            GlobalParaMgr.NextSceneName = scenesEnumName;
+            SceneManager.LoadScene(ConvertEnumToStr.GetInstance().GetStrByEnumScenes(Global.Scenes.LoadingScene));
+        }
+
+        protected IEnumerator LoadParticalEffect(float internalTime, string particalEffectPath, bool IsUseCatch,
+                   Vector3 pos, Quaternion qua, Transform parent = null, string audioClipName = null, float destroyTime = 0)
+        {
+            yield return new WaitForSeconds(internalTime);
+
+            GameObject goParticalPrefab = ResourcesMgr.GetInstance().LoadAsset(particalEffectPath, IsUseCatch);
+            goParticalPrefab.transform.position = pos;
+            goParticalPrefab.transform.rotation = qua;
+            if (parent != null)
+                goParticalPrefab.transform.parent = parent;
+            if (!string.IsNullOrEmpty(audioClipName))
+                AudioManager.PlayAudioEffectA(audioClipName);
+            if (destroyTime > 0)
+                Destroy(goParticalPrefab, destroyTime);
+        }
+
+        protected IEnumerator LoadParticalEffect_UsePool(float internalTime, GameObject goParticalEffect,
+            Vector3 pos, Quaternion qua, Transform parent = null, string audioClipName = null)
+        {
+            yield return new WaitForSeconds(internalTime);
+
+            var goClone = PoolManager.PoolsArray["_ParticalSys"].GetGameObjectByPool(goParticalEffect, goParticalEffect.transform.position, Quaternion.identity);
+            if (goClone)
+            {
+                goClone.transform.position = pos;
+                goClone.transform.rotation = qua;
+                if (parent)
+                    goClone.transform.parent = parent;
+                if (!string.IsNullOrEmpty(audioClipName))
+                    AudioManager.PlayAudioEffectA(audioClipName);
+            }
+        }
+
+        protected IEnumerator LoadParticalEffectInPool_MoveUpLabel(float internalTime, GameObject goParticalEffect,
+            Vector3 pos, Quaternion qua, GameObject goTarget, int displayNum, Transform parent = null, string audioClipName = null)
+        {
+            yield return new WaitForSeconds(internalTime);
+
+            var goClone = PoolManager.PoolsArray["_ParticalSys"].GetGameObjectByPool(goParticalEffect, goParticalEffect.transform.position, Quaternion.identity);
+            if (goClone)
+            {
+                goClone.GetComponent<MoveUpLabel>().SetTarget(goTarget);
+                goClone.GetComponent<MoveUpLabel>().SetReduceHPNumber(displayNum);
+                goClone.transform.position = pos;
+                goClone.transform.rotation = qua;
+                if (parent)
+                    goClone.transform.parent = parent;
+                if (!string.IsNullOrEmpty(audioClipName))
+                    AudioManager.PlayAudioEffectB(audioClipName);
+            }
+        }
+
+        protected IEnumerator LoadParticalEffectInPool_BossHurtLabel(float internalTime, GameObject goParticalEffect,
+            Vector3 pos, Quaternion qua, Vector3 scale, int displayNum, Transform parent = null, string audioClipName = null)
+        {
+            yield return new WaitForSeconds(internalTime);
+
+            var goClone = PoolManager.PoolsArray["_ParticalSys"].GetGameObjectByPool(goParticalEffect, goParticalEffect.transform.position, Quaternion.identity);
+            if (goClone)
+            {
+                goClone.GetComponent<BossHurtLabel>().SetReduceHPNumber(displayNum);
+
+                if (parent)
+                    goClone.transform.parent = parent;
+                goClone.transform.localPosition = pos;
+                goClone.transform.rotation = qua;
+                goClone.transform.localScale = scale;
+                if (!string.IsNullOrEmpty(audioClipName))
+                    AudioManager.PlayAudioEffectB(audioClipName);
+            }
         }
 
         /// <summary>
-        /// 公共方法：攻击敌人
+        /// 敌人的出生(加入对象缓冲池技术)
         /// </summary>
-        /// <param name="attackArea">攻击范围</param>
-        /// <param name="attackPowerMultiple">攻击力度（倍率）</param>
-        /// <param name="isDirection">攻击是否有方向性</param>
-        protected void AttackEnemy(List<GameObject> lisEnemys, Transform traNearestEnemy, float attackArea, int attackPowerMultiple, bool isDirection = true)
+        protected IEnumerator SpawnEnemey(GameObject enemyPrefab, int createEnemysNum, Transform[] enemySpawnPos, bool isCreateHPBar = false)
         {
-            //参数检查
-            if (lisEnemys == null || lisEnemys.Count <= 0)
+            yield return new WaitForSeconds(GlobalParameter.INTERVAL_TIME_0DOT5);
+            for (int i = 1; i <= createEnemysNum; i++)
             {
-                traNearestEnemy = null;
-                return;
-            }
+                yield return new WaitForSeconds(GlobalParameter.INTERVAL_TIME_1);
 
-            foreach (GameObject enemyItem in lisEnemys)
-            {
-                if (enemyItem && enemyItem.GetComponent<Ctrl_BaseEnemyProperty>())
+                //定义克隆体随机出现位置
+                var enemySpawnPosition = GetRandomEnemySpawnPosition(enemySpawnPos);
+
+                enemyPrefab.transform.position = enemySpawnPosition.transform.position;
+                var goEnemyClone = PoolManager.PoolsArray["_Enemys"].GetGameObjectByPool(enemyPrefab, enemyPrefab.transform.position, Quaternion.identity);
+
+                //添加敌人血条
+                if (isCreateHPBar)
                 {
-                    if (enemyItem.GetComponent<Ctrl_BaseEnemyProperty>().CurrentState != EnemyState.Dead)
-                    {
-                        //敌我距离
-                        float floDistance = Vector3.Distance(this.gameObject.transform.position, enemyItem.transform.position);
-                        //攻击具有方向性
-                        if (isDirection)
-                        {
-                            //定义“主角与敌人” 的方向
-                            Vector3 dir = (enemyItem.transform.position - this.gameObject.transform.position).normalized;
-                            //定义“主角与敌人”的夹角(用向量的“点乘”进行计算)
-                            float floDirection = Vector3.Dot(dir, this.gameObject.transform.forward);
-                            //如果主角与敌人在同一个方向，且在有效攻击范围内，则对敌人做伤害处理
-                            if (floDirection > 0 && floDistance <= attackArea)
-                            {
-                                enemyItem.SendMessage("OnHurt", Ctrl_HeroProperty.Instance.GetCurrentATK() * attackPowerMultiple, SendMessageOptions.DontRequireReceiver);
-                            }
-                        }
-                        //攻击无方向性
-                        else
-                        {
-                            if (floDistance <= attackArea)
-                            {
-                                enemyItem.SendMessage("OnHurt", Ctrl_HeroProperty.Instance.GetCurrentATK() * attackPowerMultiple, SendMessageOptions.DontRequireReceiver);
-                            }
-                        }
-                    }
+                    GameObject goHPBar = ResourcesMgr.GetInstance().LoadAsset("Prefabs/UI/EnemyHPBar", true);
+                    goHPBar.transform.parent = GameObject.FindGameObjectWithTag(Tag.Tag_UIPlayerInfo).transform;
+                    goHPBar.GetComponent<EnemyHPBar>().SetTargetEnemy(goEnemyClone);
                 }
             }
         }
 
-        /// <summary>
-        /// 粒子特效加载公共方法
-        /// </summary>
-        /// <param name="internalTime"></param>
-        /// <param name="strParticalEffectPath">粒子特效路径</param>
-        /// <param name="IsUseCache">是否使用缓存</param>
-        /// <param name="particalEffectPosition">粒子特效方位</param>
-        /// <param name="tranParent"></param>
-        /// <param name="strAudioEffect"></param>
-        /// <param name="destroyTime"></param>
-        /// <returns></returns>
-        protected IEnumerator LoadParticalEffectPublicMethod(float internalTime, string strParticalEffectPath, bool IsUseCache,
-                   Vector3 particalEffectPosition, Transform tranParent, string strAudioEffect = null, float destroyTime = 0)
+        public Transform GetRandomEnemySpawnPosition(Transform[] enemyCreatePos)
         {
-            //间隔时间
-            yield return new WaitForSeconds(internalTime);
-            //提取的粒子预设
-            GameObject goParticalPrefab = ResourcesMgr.GetInstance().LoadAsset(strParticalEffectPath, IsUseCache);
-            //粒子预设的位置            
-            goParticalPrefab.transform.position = particalEffectPosition;
-            //父子对象
-            if (tranParent != null)
+            var randomNum = UnityHelper.GetInstance().GetRandomNumByRange(0, enemyCreatePos.Length - 1);
+            return enemyCreatePos[randomNum];
+        }
+
+
+        protected void LevelUp(KeyValuesUpdate kv)
+        {
+            if (kv.Key.Equals("LevelUp"))
             {
-                goParticalPrefab.transform.parent = tranParent;
+                HeroLevelUp();
             }
-            //特效音频
-            if (!string.IsNullOrEmpty(strAudioEffect))
-            {
-                AudioManager.PlayAudioEffectA(strAudioEffect);
-            }
-            //销毁时间
-            if (destroyTime > 0)
-            {
-                Destroy(goParticalPrefab, destroyTime);
-            }
+        }
+
+        private void HeroLevelUp()
+        {
+            string audioClip_LevelUp = "LevelUp";
+            GameObject HeroLevelUp = ResourcesMgr.GetInstance().LoadAsset("ParticleProps/Hero_LvUp", true);
+            AudioManager.PlayAudioEffectA(audioClip_LevelUp);
         }
     }
 }

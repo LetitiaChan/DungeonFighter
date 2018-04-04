@@ -1,91 +1,66 @@
-﻿/***
- *
- *	Title:核心层帮助类
- *
- *	Description:（单例类）
- *		集成大量通用算法
- *
- *	Date:2017.02.22
- *
- *	Version:
- *		1.0
- *
- *	Author:chenx
- *
-*/
-using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
-using System.Collections.Generic;
+﻿using UnityEngine;
 
 namespace Kernal
 {
-    public class UnityHelper : MonoBehaviour
+    public class UnityHelper
     {
-        private static float _FloDeltaTime;//累计时间
-        private static UnityHelper _Instance;
+        private static UnityHelper _instance = null;
+        private float _accumulatedTime;
+
 
         private UnityHelper()
-        {
-        }
+        { }
 
         public static UnityHelper GetInstance()
         {
-            if (_Instance == null)
+            if (_instance == null)
             {
-                _Instance = new UnityHelper();
+                _instance = new UnityHelper();
             }
-            return _Instance;
+            return _instance;
         }
 
+
         /// <summary>
-        /// 间隔指定时间段，返回布尔值
+        /// 间隔指定时间段，返回布尔数值
         /// </summary>
-        /// <param name="smallIntervalTime">指定的时间段间隔(0.1-3F之间)</param>
-        /// <returns>true：表示指定时间段到了</returns>
-        public bool GetSmallTime(float smallIntervalTime)
+        /// <param name="smallIntervalTime">指定的时间段间隔（0.1-3F 秒之间）</param>
+        /// <returns>
+        /// true: 表示指定时间段到了。
+        /// </returns>
+        public bool isTimeOutSmall(float smallIntervalTime)
         {
-            _FloDeltaTime += Time.deltaTime;
-            if (_FloDeltaTime >= smallIntervalTime)
+            _accumulatedTime += Time.deltaTime;
+            if (_accumulatedTime >= smallIntervalTime)
             {
-                _FloDeltaTime = 0F;
+                _accumulatedTime = 0;
                 return true;
             }
-            return false;
+            else
+            {
+                return false;
+            }
         }
 
-        /// <summary>
-        /// （角色）面向指定目标旋转
-        /// </summary>
-        /// <param name="self">本身</param>
-        /// <param name="goal">目标</param>
-        /// <param name="floRotatSpeed">旋转速度</param>
-        public void FaceToGoal(Transform self, Transform goal, float floRotatSpeed)
+        public void FaceToGoal(Transform self, Transform goal, float rotatSpeed)
         {
-            self.rotation =
-            Quaternion.Slerp(
-                            self.rotation,
-                            Quaternion.LookRotation(new Vector3(goal.position.x, 0, goal.position.z) -
-                                new Vector3(self.position.x, 0, self.position.z)), floRotatSpeed
-                                );
+            //self.transform.LookAt(_TraNearestEnemy); //LookAt角度有问题，采用注视旋转
+            Vector3 rotatForward = new Vector3(goal.position.x, 0, goal.position.z) -
+                                    new Vector3(self.position.x, 0, self.position.z);
+            self.rotation = Quaternion.Slerp(self.rotation, Quaternion.LookRotation(rotatForward), rotatSpeed);
         }
 
-        /// <summary>
-        /// 得到指定范围的随机整数
-        /// </summary>
-        /// <param name="minNum">最小数值</param>
-        /// <param name="MaxNum">最大数值</param>
-        /// <returns></returns>
-        public int GetRandomNum(int minNum, int maxNum)
+        public int GetRandomNumByRange(int minNum, int maxNum)
         {
             int randomNumResult = 0;
 
             if (minNum == maxNum)
-            {
                 randomNumResult = minNum;
-            }
-            randomNumResult = Random.Range(minNum, maxNum + 1);
+            else
+                randomNumResult = Random.Range(minNum, maxNum + 1);
+
             return randomNumResult;
         }
+
     }
 }

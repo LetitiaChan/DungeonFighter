@@ -1,29 +1,13 @@
-﻿/***
- *
- *	Project:“地下守护神” Dungeon Fighter
- *
- *	Title:视图层：UI攻击虚拟按键按压事件处理
- *
- *	Description:
- *		1.
- *
- *	Date:2017.02.27
- *
- *	Version:
- *		1.0
- *
- *	Author:chenx
- *
-*/
-using System.Collections;
-using UnityEngine;
-
+﻿using UnityEngine;
 using Global;
 using Kernal;
 using Control;
 
 namespace View
 {
+    /// <summary>
+    /// UI攻击虚拟按键按压事件处理
+    /// </summary>
     public class View_ATKNormalPressed : StateMachineBehaviour
     {
 
@@ -35,12 +19,11 @@ namespace View
         // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
         override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            if (UnityHelper.GetInstance().GetSmallTime(GlobalParameter.INTERVAL_TIME_0DOT2))
+            if (UnityHelper.GetInstance().isTimeOutSmall(GlobalParameter.INTERVAL_TIME_0DOT2))
             {
-                //Debug.Log("OnStateUpdate");
-//#if UNITY_ANDROID || UNITY_IPHONE
-                Ctrl_HeroAttackInputByET.Instance.ResponseATKByNormal();  
-//#endif
+                //#if UNITY_ANDROID || UNITY_IPHONE
+                Ctrl_HeroAttackInputByET.Instance.ResponseATKByNormal();
+                //#endif
             }
         }
 

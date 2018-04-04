@@ -1,24 +1,5 @@
-﻿/***
- *
- *	Project:“地下守护神” Dungeon Fighter
- *
- *	Title:控制层： 主角动画控制
- *
- *	Description:
- *		1.
- *
- *	Date:2017.02.22
- *
- *	Version:
- *		1.0
- *
- *	Author:chenx
- *
-*/
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 using Global;
 using Kernal;
 
@@ -28,36 +9,54 @@ namespace Control
     {
         public static Ctrl_HeroAnimationCtrl Instance;
 
-        public AnimationClip Ani_Idle;                                         //休闲
-        public AnimationClip Ani_Runing;                                       //跑动
-        public AnimationClip Ani_NormalAttack1;                                //普通攻击1
-        public AnimationClip Ani_NormalAttack2;                                //普通攻击2
-        public AnimationClip Ani_NormalAttack3;                                //普通攻击3
-        public AnimationClip Ani_MagicTrickA;                                  //大招A
-        public AnimationClip Ani_MagicTrickB;                                  //大招B
-        public AnimationClip Ani_MagicTrickC;                                  //大招C
-        public AnimationClip Ani_MagicTrickD;                                  //大招D
-
-        public AudioClip AcHeroRuning;                                         //定义主角跑动音效剪辑
+        public AnimationClip animIdle;
+        public AnimationClip animRuning;
+        public AnimationClip animDead;
+        public AnimationClip animNormalAttack1;
+        public AnimationClip animNormalAttack2;
+        public AnimationClip animNormalAttack3;
+        public AnimationClip animMagicTrickA;
+        public AnimationClip animMagicTrickB;
+        public AnimationClip animMagicTrickC;
+        public AnimationClip animMagicTrickD;
 
         //对象缓冲池：主角剑法粒子特效
-        public GameObject goHeroNormalPartcalEffec1;                           //左右剑法粒子特效
-        public GameObject goHeroNormalPartcalEffec2;                           //剑法的中间劈砍粒子特效
+        public GameObject goHeroNormalPartcalEffec1;
+        public GameObject goHeroNormalPartcalEffec2;
 
+        //主角音效剪辑
+        public AudioClip acHeroRuning;
+        public AudioClip acHeroDead;
+        public AudioClip AcBeiJi_DaoJian_3;
+        public AudioClip AcBeiJi_DaoJian_2;
+        public AudioClip AcBeiJi_DaoJian_1;
+        public AudioClip AcSwordHero_MagicA;
+        public AudioClip AcSwordHero_MagicB;
+        public AudioClip AcSwordHero_MagicC;
 
-        private Animation _AnimationHandle;                                    //动画句柄
-        private HeroActionState _CurrentActionState = HeroActionState.None;    //主角的动画状态
-        private bool _IsSinglePlay = true;                                     //单次播放
-        private NormalATKComboState _CurATKCombo = NormalATKComboState.NormalATK1;//动画连招
+        public GameObject goMoveUpLabelPrefab;  //飘血文字
+        private GameObject goUIPlayerInfo;
 
-        /// <summary>
-        /// 属性：当前主角的动作状态
-        /// </summary>
+        private Animation _animationHandle;
+        private HeroActionState _currentActionState = HeroActionState.None;
+        private bool _isSinglePlay_Dead = true;
+        private NormalATKComboState _curATKCombo = NormalATKComboState.NormalATK1;//动画连招
+
         public HeroActionState CurrentActionState
         {
             get
             {
-                return _CurrentActionState;
+                return _currentActionState;
+            }
+        }
+
+        public GameObject GoUIPlayerInfo
+        {
+            get
+            {
+                if (goUIPlayerInfo == null)
+                    goUIPlayerInfo = GameObject.FindGameObjectWithTag(Tag.Tag_UIPlayerInfo);
+                return goUIPlayerInfo;
             }
         }
 
@@ -68,141 +67,176 @@ namespace Control
 
         void Start()
         {
-            _AnimationHandle = this.GetComponent<Animation>();
-            //默认动作状态
-            _CurrentActionState = HeroActionState.Idle;
-            //启动协程，控制主角动画状态
+            DontDestroyOnLoad(gameObject);
+
+            _animationHandle = GetComponent<Animation>();
+            _currentActionState = HeroActionState.Idle;
             StartCoroutine("ControlHeroAnimationState");
             //加快普通连招的播放速度
-            _AnimationHandle[Ani_NormalAttack1.name].speed = 2.5F;
-            _AnimationHandle[Ani_NormalAttack2.name].speed = 2.5F;
-            _AnimationHandle[Ani_NormalAttack3.name].speed = 2F;
+            _animationHandle[animNormalAttack1.name].speed = 2.5f;
+            _animationHandle[animNormalAttack2.name].speed = 2.5f;
+            _animationHandle[animNormalAttack3.name].speed = 2f;
 
-            //定义主角出现特效
             HeroDisplayParticalEffect();
         }
 
-        /// <summary>
-        /// 设置当前（动画）状态
-        /// </summary>
-        /// <param name="currentActionState"></param>
-        public void SetCurrentActionState(HeroActionState currentActionState)
-        {
-            _CurrentActionState = currentActionState;
-        }
 
         /// <summary>
-        /// 主角的动画控制
+        /// 主角的动作状态是否在发大招（ABCD）
         /// </summary>
         /// <returns></returns>
+        public bool IsHeroActionMagicTrick()
+        {
+            return _currentActionState == HeroActionState.MagicTrickA ||
+                _currentActionState == HeroActionState.MagicTrickB ||
+                _currentActionState == HeroActionState.MagicTrickC ||
+                _currentActionState == HeroActionState.MagicTrickD;
+        }
+
+        public void HeroDisplayParticalEffect()
+        {
+            StartCoroutine(LoadParticalEffect(GlobalParameter.INTERVAL_TIME_0DOT1,
+                "ParticleProps/Hero_Display", true, transform.position, transform.rotation,
+                transform, null, 0));
+        }
+
+        public void SetCurrentActionState(HeroActionState currentActionState)
+        {
+            _currentActionState = currentActionState;
+        }
+
         IEnumerator ControlHeroAnimationState()
         {
             while (true)
             {
-                yield return new WaitForSeconds(0.1F);
+                yield return new WaitForSeconds(GlobalParameter.INTERVAL_TIME_0DOT1);
                 switch (CurrentActionState)
                 {
                     case HeroActionState.NormalAttack:
                         /* 攻击连招处理(自动状态转换) */
-                        switch (_CurATKCombo)
+                        switch (_curATKCombo)
                         {
                             case NormalATKComboState.NormalATK1:
-                                _CurATKCombo = NormalATKComboState.NormalATK2;
-                                _AnimationHandle.CrossFade(Ani_NormalAttack1.name);
-                                AudioManager.PlayAudioEffectA("BeiJi_DaoJian_3");
-                                yield return new WaitForSeconds(Ani_NormalAttack1.length / 2.5F);
+                                _curATKCombo = NormalATKComboState.NormalATK2;
+                                _animationHandle.CrossFade(animNormalAttack1.name);
+                                AudioManager.PlayAudioEffectA(AcBeiJi_DaoJian_3);
+                                yield return new WaitForSeconds(animNormalAttack1.length / 2.5f);
 
-                                _CurrentActionState = HeroActionState.Idle;
+                                _currentActionState = HeroActionState.Idle;
                                 break;
                             case NormalATKComboState.NormalATK2:
-                                _CurATKCombo = NormalATKComboState.NormalATK3;
-                                _AnimationHandle.CrossFade(Ani_NormalAttack2.name);
-                                AudioManager.PlayAudioEffectA("BeiJi_DaoJian_2");
-                                yield return new WaitForSeconds(Ani_NormalAttack2.length / 2.5F);
+                                _curATKCombo = NormalATKComboState.NormalATK3;
+                                _animationHandle.CrossFade(animNormalAttack2.name);
+                                AudioManager.PlayAudioEffectA(AcBeiJi_DaoJian_2);
+                                yield return new WaitForSeconds(animNormalAttack2.length / 2.5f);
 
-                                _CurrentActionState = HeroActionState.Idle;
+                                _currentActionState = HeroActionState.Idle;
                                 break;
                             case NormalATKComboState.NormalATK3:
-                                _CurATKCombo = NormalATKComboState.NormalATK1;
-                                _AnimationHandle.CrossFade(Ani_NormalAttack3.name);
-                                AudioManager.PlayAudioEffectA("BeiJi_DaoJian_1");
-                                yield return new WaitForSeconds(Ani_NormalAttack3.length / 2F);
+                                _curATKCombo = NormalATKComboState.NormalATK1;
+                                _animationHandle.CrossFade(animNormalAttack3.name);
+                                AudioManager.PlayAudioEffectA(AcBeiJi_DaoJian_1);
+                                yield return new WaitForSeconds(animNormalAttack3.length / 2f);
 
-                                _CurrentActionState = HeroActionState.Idle;
+                                _currentActionState = HeroActionState.Idle;
                                 break;
                             default:
                                 break;
                         }
                         break;
                     case HeroActionState.MagicTrickA:
-                        _AnimationHandle.CrossFade(Ani_MagicTrickA.name);
-                        AudioManager.PlayAudioEffectA("SwordHero_MagicA");
-                        yield return new WaitForSeconds(Ani_MagicTrickA.length);
+                        _animationHandle.CrossFade(animMagicTrickA.name);
+                        AudioManager.PlayAudioEffectA(AcSwordHero_MagicA);
+                        yield return new WaitForSeconds(animMagicTrickA.length);
 
-                        _CurrentActionState = HeroActionState.Idle;
+                        if (_currentActionState == HeroActionState.MagicTrickA)
+                            _currentActionState = HeroActionState.Idle;
                         break;
                     case HeroActionState.MagicTrickB:
-                        _AnimationHandle.CrossFade(Ani_MagicTrickB.name);
-                        AudioManager.PlayAudioEffectA("SwordHero_MagicB");
-                        yield return new WaitForSeconds(Ani_MagicTrickB.length);
+                        _animationHandle.CrossFade(animMagicTrickB.name);
+                        AudioManager.PlayAudioEffectA(AcSwordHero_MagicB);
+                        yield return new WaitForSeconds(animMagicTrickB.length);
 
-                        _CurrentActionState = HeroActionState.Idle;
+                        if (_currentActionState == HeroActionState.MagicTrickB)
+                            _currentActionState = HeroActionState.Idle;
                         break;
                     case HeroActionState.MagicTrickC:
-                        _AnimationHandle.CrossFade(Ani_MagicTrickC.name);
-                        AudioManager.PlayAudioEffectA("SwordHero_MagicC");
-                        yield return new WaitForSeconds(Ani_MagicTrickC.length);
+                        _animationHandle.CrossFade(animMagicTrickC.name);
+                        AudioManager.PlayAudioEffectA(AcSwordHero_MagicC);
+                        yield return new WaitForSeconds(animMagicTrickC.length);
 
-                        _CurrentActionState = HeroActionState.Idle;
+                        if (_currentActionState == HeroActionState.MagicTrickC)
+                            _currentActionState = HeroActionState.Idle;
                         break;
                     case HeroActionState.MagicTrickD:
-                        _AnimationHandle.CrossFade(Ani_MagicTrickD.name);
-                        AudioManager.PlayAudioEffectA("SwordHero_MagicD");
-                        yield return new WaitForSeconds(Ani_MagicTrickD.length);
+                        _animationHandle.CrossFade(animMagicTrickD.name);
+                        //AudioManager.PlayAudioEffectA("SwordHero_MagicD");
+                        yield return new WaitForSeconds(animMagicTrickD.length);
 
-                        _CurrentActionState = HeroActionState.Idle;
+                        if (_currentActionState == HeroActionState.MagicTrickD)
+                            _currentActionState = HeroActionState.Idle;
                         break;
                     case HeroActionState.None:
+                        _animationHandle.CrossFade(animIdle.name);
                         break;
                     case HeroActionState.Idle:
-                        _AnimationHandle.CrossFade(Ani_Idle.name);
+                        _animationHandle.CrossFade(animIdle.name);
                         break;
                     case HeroActionState.Runing:
-                        _AnimationHandle.CrossFade(Ani_Runing.name);
-                        //处理主角跑动音效
-                        AudioManager.PlayAudioEffectB(AcHeroRuning);
-                        yield return new WaitForSeconds(AcHeroRuning.length);
+                        _animationHandle.CrossFade(animRuning.name);
+                        AudioManager.PlayAudioEffectB(acHeroRuning);
+                        yield return new WaitForSeconds(acHeroRuning.length);
                         break;
-                    default:
+                    case HeroActionState.Hurt:
+                        break;
+                    case HeroActionState.Dead:
+                        if (_isSinglePlay_Dead)
+                        {
+                            _isSinglePlay_Dead = false;
+                            _animationHandle.CrossFade(animDead.name);
+                            AudioManager.PlayAudioEffectB(acHeroDead);
+                            yield return new WaitForSeconds(animDead.length);
+                        }
                         break;
                 }
             }
         }
 
+        public void CancelRunningState()
+        {
+            if (CurrentActionState == HeroActionState.Idle || CurrentActionState == HeroActionState.Runing)
+            {
+                SetCurrentActionState(HeroActionState.Idle);
+            }
+        }
 
-        /// <summary>
-        /// 动画事件_主角大招A
-        /// </summary>
-        /// <returns></returns>
+        #region 动画事件 AnimationEvent
         public IEnumerator AnimationEvent_HeroMagicA()
         {
-
-            StartCoroutine(LoadParticalEffectPublicMethod(GlobalParameter.INTERVAL_TIME_0DOT1,
-                "ParticleProps/Hero_MagicA(bruceSkill)", true, transform.position, transform, null, 0));
+            StartCoroutine(LoadParticalEffect(GlobalParameter.INTERVAL_TIME_0DOT1,
+                "ParticleProps/Hero_MagicA(bruceSkill)", true,
+                transform.position + transform.TransformDirection(new Vector3(0F, 0F, 1f)), transform.rotation,
+                transform.parent, null, 0));
             yield break;  //(相当于 方法中的 return null)
         }
 
-        /// <summary>
-        /// 动画事件_主角大招B
-        /// </summary>
-        /// <returns></returns>
         public IEnumerator AnimationEvent_HeroMagicB()
         {
-            StartCoroutine(LoadParticalEffectPublicMethod(GlobalParameter.INTERVAL_TIME_0DOT1,
-                "ParticleProps/Hero_MagicB(groundBrokeRed)", true, transform.position + transform.TransformDirection(new Vector3(0F, 0F, 5F)),//特效位置在主角前方5m
-                transform, null, 0));
-            yield break;  //(相当于 方法中的 return null)
+            StartCoroutine(LoadParticalEffect(GlobalParameter.INTERVAL_TIME_0DOT1,
+                "ParticleProps/Hero_MagicA(bruceSkill)", true,
+                transform.position + transform.TransformDirection(new Vector3(0F, 0F, 2F)), transform.rotation,
+                transform.parent, null, 0));
+            yield break;
 
+        }
+
+        public IEnumerator AnimationEvent_HeroMagicC()
+        {
+            StartCoroutine(LoadParticalEffect(GlobalParameter.INTERVAL_TIME_0DOT1,
+                "ParticleProps/Hero_MagicC(groundBrokeRed)", true,
+                transform.position + transform.TransformDirection(new Vector3(0F, 0F, 3F)), transform.rotation,
+                transform.parent, null, 0));
+            yield break;
         }
 
         /// <summary>
@@ -211,17 +245,18 @@ namespace Control
         /// <returns></returns>
         public IEnumerator AnimationEvent_HeroNormalATK_A()
         {
-            /* 传统方式 */
-            StartCoroutine(LoadParticalEffectPublicMethod(GlobalParameter.INTERVAL_TIME_0DOT1,
-                "ParticleProps/Hero_NormalATK1", true, transform.position + transform.TransformDirection(new Vector3(0F, 0F, 1F)),
-                transform, null, 1));
-            yield break;
+            ///* 传统方式 */
+            //StartCoroutine(LoadParticalEffect(GlobalParameter.INTERVAL_TIME_0DOT1,
+            //    "ParticleProps/Hero_NormalATK1", true,
+            //    transform.position + transform.TransformDirection(new Vector3(0F, 0F, 1F)),transform.rotation,
+            //    transform, null, 1));
+            //yield break;
 
-            //定义粒子特效的位置(在主角前方5米的位置)
+
+            /*  使用对象缓冲池 */
             goHeroNormalPartcalEffec1.transform.position = transform.position + transform.TransformDirection(new Vector3(0F, 0F, 1F));
-            /*  使用对象缓冲池技术 */
-            //在缓冲池中，得到一个指定的预设“激活体”。
-            PoolManager.PoolsArray["_ParticalSys"].GetGameObjectByPool(goHeroNormalPartcalEffec1, goHeroNormalPartcalEffec1.transform.position, Quaternion.identity);
+            //PoolManager.PoolsArray["_ParticalSys"].GetGameObjectByPool(goHeroNormalPartcalEffec1, goHeroNormalPartcalEffec1.transform.position, Quaternion.identity);
+            PoolManager.PoolsArray["_ParticalSys"].GetGameObjectByPool(goHeroNormalPartcalEffec1, goHeroNormalPartcalEffec1.transform.position, transform.rotation);
             yield break;
         }
 
@@ -231,28 +266,35 @@ namespace Control
         /// <returns></returns>
         public IEnumerator AnimationEvent_HeroNormalATK_B()
         {
-            StartCoroutine(LoadParticalEffectPublicMethod(GlobalParameter.INTERVAL_TIME_0DOT1,
-                "ParticleProps/Hero_NormalATK2", true, transform.position + transform.TransformDirection(new Vector3(0F, 0F, 1F)),
-                transform, null, 1));
-            yield break;
-
-            ////定义粒子特效的位置(在主角前方5米的位置)
-            //goHeroNormalPartcalEffec2.transform.position = transform.position + transform.TransformDirection(new Vector3(0F, 0F, 1F));
-            ///*  使用对象缓冲池技术 */
-            ////在缓冲池中，得到一个指定的预设“激活体”。
-            //PoolManager.PoolsArray["_ParticalSys"].GetGameObjectByPool(goHeroNormalPartcalEffec2, goHeroNormalPartcalEffec2.transform.position, Quaternion.identity);
+            ///* 传统方式 */
+            //StartCoroutine(LoadParticalEffect(GlobalParameter.INTERVAL_TIME_0DOT1,
+            //    "ParticleProps/Hero_NormalATK2", true,
+            //    transform.position + transform.TransformDirection(new Vector3(0F, 0F, 1F)),transform.rotation,
+            //    transform, null, 1));
             //yield break;
 
+
+            /*  使用对象缓冲池 */
+            goHeroNormalPartcalEffec2.transform.position = transform.position + transform.TransformDirection(new Vector3(0F, 0F, 1F));
+            //PoolManager.PoolsArray["_ParticalSys"].GetGameObjectByPool(goHeroNormalPartcalEffec2, goHeroNormalPartcalEffec2.transform.position, Quaternion.identity);
+            PoolManager.PoolsArray["_ParticalSys"].GetGameObjectByPool(goHeroNormalPartcalEffec2, goHeroNormalPartcalEffec2.transform.position + transform.TransformDirection(new Vector3(0f, 0f, 2f)), transform.rotation);
+            yield break;
+
+        }
+        #endregion
+
+        public void Animation_HeroHurtEffect(int reduceHP)
+        {
+            StartCoroutine(LoadParticalEffectInPool_MoveUpLabel(GlobalParameter.INTERVAL_TIME_0DOT1, goMoveUpLabelPrefab,
+                gameObject.transform.position + transform.TransformDirection(new Vector3(0, 10f, 0)), Quaternion.identity, gameObject,
+                reduceHP, GoUIPlayerInfo.transform));
         }
 
-        /// <summary>
-        /// 主角登场特效
-        /// </summary>
-        private void HeroDisplayParticalEffect()
+        public void RecoverLife()
         {
-            StartCoroutine(LoadParticalEffectPublicMethod(GlobalParameter.INTERVAL_TIME_0DOT1,
-                "ParticleProps/Hero_Display", true, transform.position,
-                transform, null, 0));
+            _isSinglePlay_Dead = true;
+            SetCurrentActionState(HeroActionState.Idle);
+            HeroDisplayParticalEffect();
         }
     }
 }

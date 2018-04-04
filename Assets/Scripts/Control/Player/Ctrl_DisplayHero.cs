@@ -1,65 +1,44 @@
-﻿/***
- *
- *	Project:“地下守护神” Dungeon Fighter
- *
- *	Title:控制层:  英雄的展示
- *
- *	Description:
- *		1.
- *
- *	Date:
- *
- *	Version:
- *		1.0
- *
- *	Author:chenx
- *
-*/
-using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
-using System.Collections.Generic;
-
-using Global;
-using Kernal;
+﻿using UnityEngine;
 
 namespace Control
 {
+    /// <summary>
+    /// 选角创角时的英雄展示
+    /// </summary>
     public class Ctrl_DisplayHero : BaseControl
     {
-        public AnimationClip AniIdle;                                          //动画剪辑 休闲
-        public AnimationClip AniRun;
-        public AnimationClip AniAttack;
-        private Animation _AniCurrent;                                         //当前动画
-        private float _FloIntervalTimes = 3F;                                  //播放间隔时间
-        private int _IntRandomPlayNum;                                         //随机动作编号
+        public AnimationClip animIdle;
+        public AnimationClip animRun;
+        public AnimationClip animAttack;
+
+        private Animation _aniCurrent;
+        private float _intervalTimes = 3f;
+        private int _randomPlayNum;
 
         void Start()
         {
-            _AniCurrent = GetComponent<Animation>();
-            _FloIntervalTimes = 1F;//初次时间间隔
+            _aniCurrent = GetComponent<Animation>();
+            _intervalTimes = 1f;
         }
 
         /// <summary>
-        /// 算法： 间隔3秒钟，随机播放一个人物动作
+        /// 思路：间隔3秒钟，随机播放一个人物动作
         /// </summary>
         void Update()
         {
-            _FloIntervalTimes -= Time.deltaTime;
-            if (_FloIntervalTimes <= 0)
+            _intervalTimes -= Time.deltaTime;
+            if (_intervalTimes <= 0)
             {
-                _FloIntervalTimes = 3F;
-                _IntRandomPlayNum = Random.Range(1, 4);
-                DisplayHeroPlaying(_IntRandomPlayNum);
+                _intervalTimes = 3f;
+                _randomPlayNum = Random.Range(1, 4);
+                DisplayHeroPlaying(_randomPlayNum);
             }
         }
-        /// <summary>
-        /// 展示动作
-        /// </summary>
-        /// <param name="intPlayNum">动作编号</param>
-        internal void DisplayHeroPlaying(int intPlayNum)
+
+
+        internal void DisplayHeroPlaying(int playNum)
         {
-            switch (intPlayNum)
+            switch (playNum)
             {
                 case 1:
                     DisplayIdle();
@@ -75,34 +54,25 @@ namespace Control
                     break;
             }
         }
-        /// <summary>
-        /// 展示休闲动作
-        /// </summary>
         internal void DisplayIdle()
         {
-            if (_AniCurrent)
+            if (_aniCurrent)
             {
-                _AniCurrent.CrossFade(AniIdle.name);
+                _aniCurrent.CrossFade(animIdle.name);
             }
         }
-        /// <summary>
-        /// 展示跑动动作
-        /// </summary>
         internal void DisplayRun()
         {
-            if (_AniCurrent)
+            if (_aniCurrent)
             {
-                _AniCurrent.CrossFade(AniRun.name);
+                _aniCurrent.CrossFade(animRun.name);
             }
         }
-        /// <summary>
-        /// 展示攻击动作
-        /// </summary>
         internal void DisplayAttack()
         {
-            if (_AniCurrent)
+            if (_aniCurrent)
             {
-                _AniCurrent.CrossFade(AniAttack.name);
+                _aniCurrent.CrossFade(animAttack.name);
             }
         }
     }
