@@ -7,7 +7,7 @@
 
 using UnityEngine;
 
-public class EffectScriptSample_B : NcEffectBehaviour_B
+public class EffectScriptSample_ : NcEffectBehaviour_
 {
 	// Attribute ------------------------------------------------------------------------
 

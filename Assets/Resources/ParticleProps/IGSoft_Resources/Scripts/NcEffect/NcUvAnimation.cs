@@ -114,9 +114,11 @@ public class NcUvAnimation : NcEffectAniBehaviour
             GetComponent<Renderer>().material.mainTextureScale = new Vector2(m_fTilingX, m_fTilingY);
         }
 
-        m_fOffsetX += m_Timer.GetDeltaTime() * m_fScrollSpeedX;
-        m_fOffsetY += m_Timer.GetDeltaTime() * m_fScrollSpeedY;
-
+        if (m_Timer != null)
+        {
+            m_fOffsetX += m_Timer.GetDeltaTime() * m_fScrollSpeedX;
+            m_fOffsetY += m_Timer.GetDeltaTime() * m_fScrollSpeedY;
+        }
         bool bCallEndAni = false;
         if (m_bRepeat == false)
         {

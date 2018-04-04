@@ -10,7 +10,7 @@ using System.Collections;
 
 //[AddComponentMenu("EsayTool/NcAttachPrefab	%#A")]
 
-public class NcAttachPrefab_B : NcEffectBehaviour_B
+public class NcAttachPrefab_ : NcEffectBehaviour_
 {
 	// Attribute ------------------------------------------------------------------------
  	public		enum		AttachType				{Active, Destroy};
@@ -81,7 +81,7 @@ public class NcAttachPrefab_B : NcEffectBehaviour_B
 			m_bEnabled = false;
 		else
 #endif
-            m_bEnabled = (enabled && IsActive(gameObject) && GetComponent<NcDontActive_B>() == null);
+            m_bEnabled = (enabled && IsActive(gameObject) && GetComponent<NcDontActive_>() == null);
 
 	}
 
@@ -154,18 +154,18 @@ public class NcAttachPrefab_B : NcEffectBehaviour_B
 		// m_fPrefabLifeTime
 		if (0 < m_fPrefabLifeTime)
 		{
-            NcAutoDestruct_B ncAd = m_CreateGameObject.GetComponent<NcAutoDestruct_B>();
+            NcAutoDestruct_ ncAd = m_CreateGameObject.GetComponent<NcAutoDestruct_>();
 			if (ncAd == null)
-                ncAd = m_CreateGameObject.AddComponent<NcAutoDestruct_B>();
+                ncAd = m_CreateGameObject.AddComponent<NcAutoDestruct_>();
 			ncAd.m_fLifeTime = m_fPrefabLifeTime;
 		}
 
 		// m_bDetachParent
 		if (m_bDetachParent)
 		{
-            NcDetachParent_B detachCom = m_CreateGameObject.GetComponent<NcDetachParent_B>();
+            NcDetachParent_ detachCom = m_CreateGameObject.GetComponent<NcDetachParent_>();
 			if (detachCom == null)
-                detachCom = m_CreateGameObject.AddComponent<NcDetachParent_B>();
+                detachCom = m_CreateGameObject.AddComponent<NcDetachParent_>();
 		}
 
 		if ((0 == m_fRepeatTime || m_AttachType == AttachType.Destroy) && 0 < m_nRepeatCount && m_nCreateCount < m_nRepeatCount)

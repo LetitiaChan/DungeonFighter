@@ -8,7 +8,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class NcSpriteAnimation_B : NcEffectAniBehaviour_B
+public class NcSpriteAnimation_ : NcEffectAniBehaviour_
 {
 	// Attribute ------------------------------------------------------------------------
 	public		enum			TEXTURE_TYPE				{TileTexture, TrimTexture, SpriteFactory};
@@ -28,13 +28,13 @@ public class NcSpriteAnimation_B : NcEffectAniBehaviour_B
 	public		int				m_nTilingY					= 2;
 
 	public		GameObject						m_NcSpriteFactoryPrefab	= null;
-    protected NcSpriteFactory_B m_NcSpriteFactoryCom = null;
-    public NcSpriteFactory_B.NcFrameInfo[] m_NcSpriteFrameInfos = null;
+    protected NcSpriteFactory_ m_NcSpriteFactoryCom = null;
+    public NcSpriteFactory_.NcFrameInfo[] m_NcSpriteFrameInfos = null;
 	public		float							m_fUvScale				= 1;
 	public		int								m_nSpriteFactoryIndex	= 0;
 
-    public NcSpriteFactory_B.MESH_TYPE m_MeshType = NcSpriteFactory_B.MESH_TYPE.BuiltIn_Plane;
-    public NcSpriteFactory_B.ALIGN_TYPE m_AlignType = NcSpriteFactory_B.ALIGN_TYPE.CENTER;
+    public NcSpriteFactory_.MESH_TYPE m_MeshType = NcSpriteFactory_.MESH_TYPE.BuiltIn_Plane;
+    public NcSpriteFactory_.ALIGN_TYPE m_AlignType = NcSpriteFactory_.ALIGN_TYPE.CENTER;
 
 	protected	bool			m_bCreateBuiltInPlane		= false;
 	[HideInInspector]
@@ -105,14 +105,14 @@ public class NcSpriteAnimation_B : NcEffectAniBehaviour_B
 
 	public int GetMaxFrameCount()
 	{
-        if (m_TextureType == NcSpriteAnimation_B.TEXTURE_TYPE.TileTexture)
+        if (m_TextureType == NcSpriteAnimation_.TEXTURE_TYPE.TileTexture)
 			return m_nTilingX * m_nTilingY;
 		else return m_NcSpriteFrameInfos.Length;
 	}
 
 	public int GetValidFrameCount()
 	{
-        if (m_TextureType == NcSpriteAnimation_B.TEXTURE_TYPE.TileTexture)
+        if (m_TextureType == NcSpriteAnimation_.TEXTURE_TYPE.TileTexture)
 			return m_nTilingX * m_nTilingY - m_nStartFrame;
 		else return m_NcSpriteFrameInfos.Length - m_nStartFrame;
 	}
@@ -124,10 +124,10 @@ public class NcSpriteAnimation_B : NcEffectAniBehaviour_B
 // 		if (IsCreatingEditObject() == false)
 // #endif
 		{
-            if (m_NcSpriteFactoryPrefab == null && gameObject.GetComponent<NcSpriteFactory_B>() != null)
+            if (m_NcSpriteFactoryPrefab == null && gameObject.GetComponent<NcSpriteFactory_>() != null)
 				m_NcSpriteFactoryPrefab = gameObject;
-            if (m_NcSpriteFactoryPrefab && m_NcSpriteFactoryPrefab.GetComponent<NcSpriteFactory_B>() != null)
-                m_NcSpriteFactoryCom = m_NcSpriteFactoryPrefab.GetComponent<NcSpriteFactory_B>();
+            if (m_NcSpriteFactoryPrefab && m_NcSpriteFactoryPrefab.GetComponent<NcSpriteFactory_>() != null)
+                m_NcSpriteFactoryCom = m_NcSpriteFactoryPrefab.GetComponent<NcSpriteFactory_>();
 		}
 
 		if (m_MeshFilter == null)
@@ -235,11 +235,11 @@ public class NcSpriteAnimation_B : NcEffectAniBehaviour_B
 	{
 		if (m_NcSpriteFactoryCom == null)
 		{
-            if (m_NcSpriteFactoryPrefab && m_NcSpriteFactoryPrefab.GetComponent<NcSpriteFactory_B>() != null)
-                m_NcSpriteFactoryCom = m_NcSpriteFactoryPrefab.GetComponent<NcSpriteFactory_B>();
+            if (m_NcSpriteFactoryPrefab && m_NcSpriteFactoryPrefab.GetComponent<NcSpriteFactory_>() != null)
+                m_NcSpriteFactoryCom = m_NcSpriteFactoryPrefab.GetComponent<NcSpriteFactory_>();
 			else return;
 		}
-        NcSpriteFactory_B.NcSpriteNode spriteNode = m_NcSpriteFactoryCom.GetSpriteNode(nSpriteFactoryIndex);
+        NcSpriteFactory_.NcSpriteNode spriteNode = m_NcSpriteFactoryCom.GetSpriteNode(nSpriteFactoryIndex);
 
 		m_bBuildSpriteObj		= false;
 		m_bAutoDestruct			= false;
@@ -341,7 +341,7 @@ public class NcSpriteAnimation_B : NcEffectAniBehaviour_B
 			return false;
 		if (m_nSpriteFactoryIndex < 0 || m_NcSpriteFactoryCom.GetSpriteNodeCount() <= m_nSpriteFactoryIndex)
 			return false;
-        if (m_NcSpriteFactoryCom.m_SpriteType != NcSpriteFactory_B.SPRITE_TYPE.NcSpriteAnimation)
+        if (m_NcSpriteFactoryCom.m_SpriteType != NcSpriteFactory_.SPRITE_TYPE.NcSpriteAnimation)
 			return false;
 		GetComponent<Renderer>().sharedMaterial = m_NcSpriteFactoryPrefab.GetComponent<Renderer>().sharedMaterial;
 		return true;
@@ -358,13 +358,13 @@ public class NcSpriteAnimation_B : NcEffectAniBehaviour_B
 				 m_MeshFilter = gameObject.GetComponent<MeshFilter>();
 			else m_MeshFilter = gameObject.AddComponent<MeshFilter>();
 		}
-        NcSpriteFactory_B.CreatePlane(m_MeshFilter, m_fUvScale, m_NcSpriteFrameInfos[nSelIndex], m_AlignType, m_MeshType);
+        NcSpriteFactory_.CreatePlane(m_MeshFilter, m_fUvScale, m_NcSpriteFrameInfos[nSelIndex], m_AlignType, m_MeshType);
 	}
 
 	void UpdateBuiltInPlane(int nSelIndex)
 	{
-        NcSpriteFactory_B.UpdatePlane(m_MeshFilter, m_fUvScale, m_NcSpriteFrameInfos[nSelIndex], m_AlignType);
-        NcSpriteFactory_B.UpdateMeshUVs(m_MeshFilter, m_NcSpriteFrameInfos[nSelIndex].m_TextureUvOffset);
+        NcSpriteFactory_.UpdatePlane(m_MeshFilter, m_fUvScale, m_NcSpriteFrameInfos[nSelIndex], m_AlignType);
+        NcSpriteFactory_.UpdateMeshUVs(m_MeshFilter, m_NcSpriteFrameInfos[nSelIndex].m_TextureUvOffset);
 	}
 
 	bool UpdateMeshUVsByTileTexture(Rect uv)

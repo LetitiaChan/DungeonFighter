@@ -4,22 +4,21 @@ using System.Collections;
 public class fireexp : MonoBehaviour
 {
 
-    //private float destorytime;
-    //// Use this for initialization
-    //void Start()
-    //{
-    //    destorytime = 4;
-    //}
+    private float destorytime;
 
-    //// Update is called once per frame
-    //void Update()
-    //{
+    void Start()
+    {
+        destorytime = 4;
+    }
 
-    //    destorytime -= Time.deltaTime;
+    void Update()
+    {
 
-    //    if (destorytime <= 0)
-    //    {
-    //        Destroy(this.gameObject);
-    //    }
-    //}
+        destorytime -= Time.deltaTime;
+
+        if (destorytime <= 0)
+        {
+            Destroy(this.gameObject);
+        }
+    }
 }

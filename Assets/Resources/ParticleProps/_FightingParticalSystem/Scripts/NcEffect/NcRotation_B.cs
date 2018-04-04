@@ -14,7 +14,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class NcRotation_B : NcEffectBehaviour_B
+public class NcRotation_ : NcEffectBehaviour_
 {
 	// Attribute ------------------------------------------------------------------------
 	public	bool		m_bWorldSpace		= false;
@@ -24,7 +24,7 @@ public class NcRotation_B : NcEffectBehaviour_B
 #if UNITY_EDITOR
 	public override string CheckProperty()
 	{
-        if (GetComponent<NcBillboard_B>() != null)
+        if (GetComponent<NcBillboard_>() != null)
 			return "SCRIPT_CLASH_ROTATEBILL";
 		return "";	// no error
 	}

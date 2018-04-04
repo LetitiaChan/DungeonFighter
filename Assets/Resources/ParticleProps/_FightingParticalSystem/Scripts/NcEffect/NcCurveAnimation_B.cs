@@ -10,7 +10,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class NcCurveAnimation_B : NcEffectAniBehaviour_B
+public class NcCurveAnimation_: NcEffectAniBehaviour_
 {
 	// Class ------------------------------------------------------------------------
 	class NcComparerCurve : IComparer<NcInfoCurve>
@@ -245,7 +245,7 @@ public class NcCurveAnimation_B : NcEffectAniBehaviour_B
 	protected	Material			m_MainMaterial;
 	protected	string[]			m_ChildColorNames;
 	protected	Renderer[]			m_ChildRenderers;
-    protected NcUvAnimation_B m_NcUvAnimation;
+    protected NcUvAnimation_ m_NcUvAnimation;
 
 	// Property -------------------------------------------------------------------------
 #if UNITY_EDITOR
@@ -416,7 +416,7 @@ public class NcCurveAnimation_B : NcEffectAniBehaviour_B
 				case NcInfoCurve.APPLY_TYPE.TEXTUREUV:
 					{
 						if (m_NcUvAnimation == null)
-                            m_NcUvAnimation = GetComponent<NcUvAnimation_B>();
+                            m_NcUvAnimation = GetComponent<NcUvAnimation_>();
 						if (m_NcUvAnimation)
 							curveInfo.m_OriginalValue = new Vector4(m_NcUvAnimation.m_fScrollSpeedX, m_NcUvAnimation.m_fScrollSpeedY, 0, 0);
 						curveInfo.m_BeforeValue		= curveInfo.m_OriginalValue;
@@ -564,7 +564,7 @@ public class NcCurveAnimation_B : NcEffectAniBehaviour_B
 		return m_fElapsedRate;
 	}
 
-    public void CopyTo(NcCurveAnimation_B target, bool bCurveOnly)
+    public void CopyTo(NcCurveAnimation_ target, bool bCurveOnly)
 	{
 		target.m_CurveInfoList = new List<NcInfoCurve>();
 
@@ -578,7 +578,7 @@ public class NcCurveAnimation_B : NcEffectAniBehaviour_B
 		}
 	}
 
-    public void AppendTo(NcCurveAnimation_B target, bool bCurveOnly)
+    public void AppendTo(NcCurveAnimation_ target, bool bCurveOnly)
 	{
 		if (target.m_CurveInfoList == null)
 			target.m_CurveInfoList = new List<NcInfoCurve>();

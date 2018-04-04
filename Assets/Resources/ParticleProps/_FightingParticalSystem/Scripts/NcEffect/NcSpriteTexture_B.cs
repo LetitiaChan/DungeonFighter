@@ -8,18 +8,18 @@
 using UnityEngine;
 using System.Collections;
 
-public class NcSpriteTexture_B : NcEffectBehaviour_B
+public class NcSpriteTexture_ : NcEffectBehaviour_
 {
 	// Attribute ------------------------------------------------------------------------
 	public		GameObject						m_NcSpriteFactoryPrefab	= null;
-    protected NcSpriteFactory_B m_NcSpriteFactoryCom = null;
-    public NcSpriteFactory_B.NcFrameInfo[] m_NcSpriteFrameInfos = null;
+    protected NcSpriteFactory_ m_NcSpriteFactoryCom = null;
+    public NcSpriteFactory_.NcFrameInfo[] m_NcSpriteFrameInfos = null;
 	public		float							m_fUvScale				= 1;
 	public		int								m_nSpriteFactoryIndex	= 0;
 	public		int								m_nFrameIndex			= 0;
 
-    public NcSpriteFactory_B.MESH_TYPE m_MeshType = NcSpriteFactory_B.MESH_TYPE.BuiltIn_Plane;
-    public NcSpriteFactory_B.ALIGN_TYPE m_AlignType = NcSpriteFactory_B.ALIGN_TYPE.CENTER;
+    public NcSpriteFactory_.MESH_TYPE m_MeshType = NcSpriteFactory_.MESH_TYPE.BuiltIn_Plane;
+    public NcSpriteFactory_.ALIGN_TYPE m_AlignType = NcSpriteFactory_.ALIGN_TYPE.CENTER;
 
 	protected	GameObject						m_EffectObject			= null;
 
@@ -29,7 +29,7 @@ public class NcSpriteTexture_B : NcEffectBehaviour_B
 	{
 		if (1 < gameObject.GetComponents(GetType()).Length)
 			return "SCRIPT_WARRING_DUPLICATE";
-        if (m_NcSpriteFactoryPrefab == null || m_NcSpriteFactoryPrefab.GetComponent<NcSpriteFactory_B>() == null)
+        if (m_NcSpriteFactoryPrefab == null || m_NcSpriteFactoryPrefab.GetComponent<NcSpriteFactory_>() == null)
 			return "SCRIPT_EMPTY_SPRITEFACTORY";
 		if (1 < GetEditingUvComponentCount())
 			return "SCRIPT_DUPERR_EDITINGUV";
@@ -47,10 +47,10 @@ public class NcSpriteTexture_B : NcEffectBehaviour_B
 // 		if (IsCreatingEditObject() == false)
 // #endif
 		{
-            if (m_NcSpriteFactoryPrefab == null && gameObject.GetComponent<NcSpriteFactory_B>() != null)
+            if (m_NcSpriteFactoryPrefab == null && gameObject.GetComponent<NcSpriteFactory_>() != null)
 				m_NcSpriteFactoryPrefab = gameObject;
-            if (m_NcSpriteFactoryPrefab && m_NcSpriteFactoryPrefab.GetComponent<NcSpriteFactory_B>() != null)
-                m_NcSpriteFactoryCom = m_NcSpriteFactoryPrefab.GetComponent<NcSpriteFactory_B>();
+            if (m_NcSpriteFactoryPrefab && m_NcSpriteFactoryPrefab.GetComponent<NcSpriteFactory_>() != null)
+                m_NcSpriteFactoryCom = m_NcSpriteFactoryPrefab.GetComponent<NcSpriteFactory_>();
 		}
 	}
 
@@ -68,8 +68,8 @@ public class NcSpriteTexture_B : NcEffectBehaviour_B
 	{
 		if (m_NcSpriteFactoryCom == null)
 		{
-            if (m_NcSpriteFactoryPrefab && m_NcSpriteFactoryPrefab.GetComponent<NcSpriteFactory_B>() != null)
-                m_NcSpriteFactoryCom = m_NcSpriteFactoryPrefab.GetComponent<NcSpriteFactory_B>();
+            if (m_NcSpriteFactoryPrefab && m_NcSpriteFactoryPrefab.GetComponent<NcSpriteFactory_>() != null)
+                m_NcSpriteFactoryCom = m_NcSpriteFactoryPrefab.GetComponent<NcSpriteFactory_>();
 			else return;
 		}
 		m_nSpriteFactoryIndex	= nSpriteFactoryIndex;
@@ -98,8 +98,8 @@ public class NcSpriteTexture_B : NcEffectBehaviour_B
 				 m_MeshFilter = gameObject.GetComponent<MeshFilter>();
 			else m_MeshFilter = gameObject.AddComponent<MeshFilter>();
 		}
-        NcSpriteFactory_B.CreatePlane(m_MeshFilter, m_fUvScale, m_NcSpriteFrameInfos[m_nFrameIndex], m_AlignType, m_MeshType);
-        NcSpriteFactory_B.UpdateMeshUVs(m_MeshFilter, m_NcSpriteFrameInfos[m_nFrameIndex].m_TextureUvOffset);
+        NcSpriteFactory_.CreatePlane(m_MeshFilter, m_fUvScale, m_NcSpriteFrameInfos[m_nFrameIndex], m_AlignType, m_MeshType);
+        NcSpriteFactory_.UpdateMeshUVs(m_MeshFilter, m_NcSpriteFrameInfos[m_nFrameIndex].m_TextureUvOffset);
 // 		{
 // // 			Debug.Log("m_Renderer.material");
 // 			renderer.material.mainTextureScale	= new Vector2(m_fTilingX, m_fTilingY);
@@ -123,7 +123,7 @@ public class NcSpriteTexture_B : NcEffectBehaviour_B
 			return false;
 		if (m_nSpriteFactoryIndex < 0 || m_NcSpriteFactoryCom.GetSpriteNodeCount() <= m_nSpriteFactoryIndex)
 			return false;
-        if (m_NcSpriteFactoryCom.m_SpriteType != NcSpriteFactory_B.SPRITE_TYPE.NcSpriteTexture)
+        if (m_NcSpriteFactoryCom.m_SpriteType != NcSpriteFactory_.SPRITE_TYPE.NcSpriteTexture)
 			return false;
 		GetComponent<Renderer>().sharedMaterial = m_NcSpriteFactoryPrefab.GetComponent<Renderer>().sharedMaterial;
 		return true;

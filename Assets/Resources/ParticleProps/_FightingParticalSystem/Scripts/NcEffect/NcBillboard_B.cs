@@ -9,7 +9,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class NcBillboard_B : NcEffectBehaviour_B
+public class NcBillboard_ : NcEffectBehaviour_
 {
 	// Attribute ------------------------------------------------------------------------
 	public		bool			m_bCameraLookAt;

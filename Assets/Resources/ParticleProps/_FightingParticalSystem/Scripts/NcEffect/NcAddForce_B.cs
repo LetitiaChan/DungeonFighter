@@ -8,7 +8,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class NcAddForceB : NcEffectBehaviour_B
+public class NcAddForceB : NcEffectBehaviour_
 {
 	// Attribute ------------------------------------------------------------------------
 	public		Vector3		m_AddForce				= new Vector3(0, 300, 0);

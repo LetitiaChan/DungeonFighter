@@ -10,7 +10,7 @@ using System.Collections;
 
 // [AddComponentMenu("FXMaker/NcDelayActive	%#F")]
 
-public class NcDelayActive_B : NcEffectBehaviour_B
+public class NcDelayActive_ : NcEffectBehaviour_
 {
 	public		string		NotAvailable	 = "This component is not available.";
 

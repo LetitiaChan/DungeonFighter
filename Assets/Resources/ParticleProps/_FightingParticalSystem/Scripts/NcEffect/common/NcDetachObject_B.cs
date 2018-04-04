@@ -8,7 +8,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class NcDetachObject_B : NcEffectBehaviour_B
+public class NcDetachObject_ : NcEffectBehaviour_
 {
 	// Attribute ------------------------------------------------------------------------
 	public		GameObject			m_LinkGameObject;
@@ -16,7 +16,7 @@ public class NcDetachObject_B : NcEffectBehaviour_B
 	// Property -------------------------------------------------------------------------
 	public static void Create(GameObject parentObj, GameObject linkObject)
 	{
-        NcDetachObject_B deObj = parentObj.AddComponent<NcDetachObject_B>();
+        NcDetachObject_ deObj = parentObj.AddComponent<NcDetachObject_>();
 		deObj.m_LinkGameObject = linkObject;
 	}
 

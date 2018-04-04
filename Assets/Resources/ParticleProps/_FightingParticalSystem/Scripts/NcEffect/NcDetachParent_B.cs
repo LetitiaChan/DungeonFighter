@@ -10,7 +10,7 @@ using System.Collections;
 
 // [AddComponentMenu("EsayTool/NcDetachParent	%#D")]
 
-public class NcDetachParent_B : NcEffectBehaviour_B
+public class NcDetachParent_ : NcEffectBehaviour_
 {
 	// Attribute ------------------------------------------------------------------------
 	public		bool				m_bFollowParentTransform	= true;
@@ -56,7 +56,7 @@ public class NcDetachParent_B : NcEffectBehaviour_B
 			if (transform.parent != null)
 			{
 				m_ParentGameObject = transform.parent.gameObject;
-                NcDetachObject_B.Create(m_ParentGameObject, transform.gameObject);
+                NcDetachObject_.Create(m_ParentGameObject, transform.gameObject);
 			}
 
 			// Detach Parent

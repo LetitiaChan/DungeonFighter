@@ -10,7 +10,7 @@ using UnityEngine;
 
 using System.Collections;
 
-public class NcDuplicator_B : NcEffectBehaviour_B
+public class NcDuplicator_ : NcEffectBehaviour_
 {
 	// Attribute ------------------------------------------------------------------------
 	public		float			m_fDuplicateTime		= 0.1f;
@@ -66,7 +66,7 @@ public class NcDuplicator_B : NcEffectBehaviour_B
 #if UNITY_EDITOR
 		if (IsCreatingEditObject() == false)
 #endif
-            if (transform.parent != null && (enabled && IsActive(gameObject) && GetComponent<NcDontActive_B>() == null))
+            if (transform.parent != null && (enabled && IsActive(gameObject) && GetComponent<NcDontActive_>() == null))
 				InitCloneObject();
 	}
 
@@ -117,12 +117,12 @@ public class NcDuplicator_B : NcEffectBehaviour_B
 			HideNcDelayActive(m_ClonObject);
 
 			// Remove Dup
-            NcDuplicator_B durCom = m_ClonObject.GetComponent<NcDuplicator_B>();
+            NcDuplicator_ durCom = m_ClonObject.GetComponent<NcDuplicator_>();
 			if (durCom != null)
 				DestroyImmediate(durCom);
 
 			// Remove NcDelayActive
-            NcDelayActive_B delCom = m_ClonObject.GetComponent<NcDelayActive_B>();
+            NcDelayActive_ delCom = m_ClonObject.GetComponent<NcDelayActive_>();
 			if (delCom != null)
 				DestroyImmediate(delCom);
 
@@ -130,7 +130,7 @@ public class NcDuplicator_B : NcEffectBehaviour_B
 			// remove OtherComponent
 			Component[] coms = transform.GetComponents<Component>();
 			for (int n = 0; n < coms.Length; n++)
-                if ((coms[n] is Transform) == false && (coms[n] is NcDuplicator_B) == false)
+                if ((coms[n] is Transform) == false && (coms[n] is NcDuplicator_) == false)
 					Destroy(coms[n]);
 
 			// removeChild
@@ -159,9 +159,9 @@ public class NcDuplicator_B : NcEffectBehaviour_B
 		// m_fDuplicateLifeTime
 		if (0 < m_fDuplicateLifeTime)
 		{
-            NcAutoDestruct_B ncAd = createObj.GetComponent<NcAutoDestruct_B>();
+            NcAutoDestruct_ ncAd = createObj.GetComponent<NcAutoDestruct_>();
 			if (ncAd == null)
-                ncAd = createObj.AddComponent<NcAutoDestruct_B>();
+                ncAd = createObj.AddComponent<NcAutoDestruct_>();
 			ncAd.m_fLifeTime	= m_fDuplicateLifeTime;
 		}
 

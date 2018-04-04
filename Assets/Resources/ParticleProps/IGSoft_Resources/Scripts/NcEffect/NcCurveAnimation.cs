@@ -245,11 +245,11 @@ public class NcCurveAnimation : NcEffectAniBehaviour
 	protected	Material			m_MainMaterial;
 	protected	string[]			m_ChildColorNames;
 	protected	Renderer[]			m_ChildRenderers;
-	protected	NcUvAnimation		m_NcUvAnimation;
+    protected NcUvAnimation m_NcUvAnimation;
 
-	// Property -------------------------------------------------------------------------
+    // Property -------------------------------------------------------------------------
 #if UNITY_EDITOR
-	public override string CheckProperty()
+    public override string CheckProperty()
 	{
 		if (1 < gameObject.GetComponents(GetType()).Length)
 			return "SCRIPT_WARRING_DUPLICATE";

@@ -8,7 +8,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class NcTilingTexture_B : NcEffectBehaviour_B
+public class NcTilingTexture_ : NcEffectBehaviour_
 {
 	// Attribute ------------------------------------------------------------------------
 	public		float		m_fTilingX			= 2;

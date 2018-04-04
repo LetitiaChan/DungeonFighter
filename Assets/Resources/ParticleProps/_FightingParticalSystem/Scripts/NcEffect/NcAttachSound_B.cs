@@ -10,7 +10,7 @@ using System.Collections;
 
 // [AddComponentMenu("FXMaker/NcAttachSound")]
 
-public class NcAttachSound_B : NcEffectBehaviour_B
+public class NcAttachSound_ : NcEffectBehaviour_
 {
 	// Attribute ------------------------------------------------------------------------
 	public		float		m_fDelayTime;

@@ -8,7 +8,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class NcUvAnimation_B : NcEffectAniBehaviour_B
+public class NcUvAnimation_ : NcEffectAniBehaviour_
 {
     // Attribute ------------------------------------------------------------------------
     public float m_fScrollSpeedX = 1.0f;
