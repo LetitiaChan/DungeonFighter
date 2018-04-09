@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Dialogs_CN>
+  <Dialogs DialogSecNum="1" DialogSecName="开场对白" SectionIndex="1"  DialogSide="Hero" DialogPerson="李逍遥" DialogContent ="我这是在哪里啊？"  DialogButton="False"></Dialogs>
+  <Dialogs DialogSecNum="1" DialogSecName="开场对白" SectionIndex="2"  DialogSide="NPC" DialogPerson="洛祭司"  DialogContent ="年轻人，这里是冒险者的乐园，欢迎来到雅斯兰大陆的地下城堡。." ></Dialogs>
+  <Dialogs DialogSecNum="1" DialogSecName="开场对白" SectionIndex="3"  DialogSide="Hero" DialogPerson="李逍遥"  DialogContent ="什么，什么... 你又是谁？" ></Dialogs>
+  <Dialogs DialogSecNum="1" DialogSecName="开场对白" SectionIndex="4"  DialogSide="NPC" DialogPerson="洛祭司"  DialogContent ="我叫洛祭司，雅斯兰大陆的预言家。呵呵，在你讲更多疑问前，先解决掉眼前的麻烦吧。" ></Dialogs>
+  <Dialogs DialogSecNum="1" DialogSecName="开场对白" SectionIndex="5"  DialogSide="Hero" DialogPerson="李逍遥"  DialogContent ="你是指哥布林吗？ 它们只是乌合之众罢了。" ></Dialogs>
+  <Dialogs DialogSecNum="1" DialogSecName="开场对白" SectionIndex="6"  DialogSide="NPC" DialogPerson="洛祭司"  DialogContent ="奥，看来你信心满满嘛。 那么就来先熟悉一下基本操作吧。" ></Dialogs>
+  <Dialogs DialogSecNum="2" DialogSecName="新手指导介绍ET" SectionIndex="1"  DialogSide="NPC" DialogPerson="爱丽丝"  DialogContent ="你好，我是爱丽丝。" ></Dialogs>
+  <Dialogs DialogSecNum="2" DialogSecName="新手指导介绍ET" SectionIndex="2"  DialogSide="NPC" DialogPerson="爱丽丝"  DialogContent ="你先试一下最基本操作。" ></Dialogs>
+  <Dialogs DialogSecNum="2" DialogSecName="新手指导介绍ET" SectionIndex="3"  DialogSide="NPC" DialogPerson="爱丽丝"  DialogContent ="请触摸屏幕左边的摇杆，来回移动" ></Dialogs>
+  <Dialogs DialogSecNum="3" DialogSecName="新手指导介绍虚拟按键" SectionIndex="1"  DialogSide="NPC" DialogPerson="爱丽丝"  DialogContent ="小心即将到来的敌人，点击右边的虚拟按键，来攻击吧" ></Dialogs>
+  <Dialogs DialogSecNum="4" DialogSecName="新手指导介绍完毕" SectionIndex="1"  DialogSide="NPC" DialogPerson="爱丽丝"  DialogContent ="好了，游戏的最基本操作，我就先介绍到这。" ></Dialogs>
+  <Dialogs DialogSecNum="5" DialogSecName="NPC1对话" SectionIndex="1"  DialogSide="NPC" DialogPerson="摩西"  DialogContent ="英雄！这里是雅斯兰大陆的地下城堡区，你怎么会来到这里？" ></Dialogs>
+  <Dialogs DialogSecNum="5" DialogSecName="NPC1对话" SectionIndex="2"  DialogSide="Hero" DialogPerson="李逍遥"  DialogContent ="自从上古大爆炸以来，先祖就命我来找到发动灾难之源的“奥斯魔兽”，并铲除之。" ></Dialogs>
+  <Dialogs DialogSecNum="5" DialogSecName="NPC1对话" SectionIndex="3"  DialogSide="NPC" DialogPerson="摩西"  DialogContent ="年轻人，你太狂妄了，以你一己之力岂能为之，你赶快回去吧。" ></Dialogs>
+  <Dialogs DialogSecNum="5" DialogSecName="NPC1对话" SectionIndex="4"  DialogSide="Hero" DialogPerson="李逍遥"  DialogContent ="是洛祭司让你说这些的吗？" ></Dialogs>
+  <Dialogs DialogSecNum="5" DialogSecName="NPC1对话" SectionIndex="5"  DialogSide="NPC" DialogPerson="摩西"  DialogContent ="好吧，既然我说服不了你，你好自为之吧。但我劝你千万不要去雅斯兰大陆地下城堡的核心区域，你会九死一生的！" ></Dialogs>
+  <Dialogs DialogSecNum="5" DialogSecName="NPC1对话" SectionIndex="6"  DialogSide="Hero" DialogPerson="李逍遥"  DialogContent ="谢了，但我还是会去的!" ></Dialogs>
+  <Dialogs DialogSecNum="6" DialogSecName="NPC2对话" SectionIndex="1"  DialogSide="NPC" DialogPerson="克洛斯"  DialogContent ="大侠：听说你去雅斯兰大陆地下城堡的核心区域" ></Dialogs>
+  <Dialogs DialogSecNum="6" DialogSecName="NPC2对话" SectionIndex="2"  DialogSide="Hero" DialogPerson="李逍遥"  DialogContent ="是的。" ></Dialogs>
+  <Dialogs DialogSecNum="6" DialogSecName="NPC2对话" SectionIndex="3"  DialogSide="NPC" DialogPerson="克洛斯"  DialogContent ="预言家洛祭司早就料到会这样，命我前来等候送你几件宝物！" ></Dialogs>
+  <Dialogs DialogSecNum="6" DialogSecName="NPC2对话" SectionIndex="4"  DialogSide="Hero" DialogPerson="李逍遥"  DialogContent ="什么宝物，先谢你了" ></Dialogs>
+  <Dialogs DialogSecNum="6" DialogSecName="NPC2对话" SectionIndex="5"  DialogSide="NPC" DialogPerson="克洛斯"  DialogContent ="要谢就谢先知洛祭司吧。请打开您的背包，装备上这些宝物。" ></Dialogs>
+  <Dialogs DialogSecNum="6" DialogSecName="NPC2对话" SectionIndex="6"  DialogSide="Hero" DialogPerson="李逍遥"  DialogContent ="好的，先谢了！" ></Dialogs>
+  <Dialogs DialogSecNum="7" DialogSecName="NPC3对话" SectionIndex="1"  DialogSide="NPC" DialogPerson="守门人"  DialogContent ="年轻人，再往前就是雅斯兰大陆地下城堡的核心区域了。请打开任务面板接取任务。" DialogButton="True"></Dialogs>
+</Dialogs_CN>

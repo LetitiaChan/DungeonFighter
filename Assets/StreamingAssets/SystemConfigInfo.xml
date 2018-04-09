@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--游戏项目整体配置核心参数-->
+<SystemConfigInfo>
+  <!--Log日志核心参数-->
+  <LogPath>D:\projects\Dungeon Fighter\DungeonFighter\DungeonFighterLog.txt</LogPath>
+  <!--日志的状态：开发模式 Develop/指定代码输出模式   Special/部署模式   Deplay/停止模式-->
+  <LogState>Develop</LogState>
+  <!--日志最大容量-->
+  <LogMaxCapacity>2000</LogMaxCapacity>
+  <!--日志的缓存数量-->
+  <LogBufferNumber>1</LogBufferNumber>
+
+</SystemConfigInfo>
