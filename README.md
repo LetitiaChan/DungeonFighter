@@ -1,8 +1,8 @@
 # DungeonFighter
-DungeonFighter，APRG Mobile Game.
-MVC架构，对象缓冲池，小物件层消隐，手动遮挡剔除。
-常用设计模式应用（观察者、责任链等）
-with Unity5.3.6 + UGUI + EasyTouch + DOTween
+DungeonFighter，APRG Mobile Game.<br>
+MVC架构，对象缓冲池，小物件层消隐，手动遮挡剔除。<br>
+常用设计模式应用（观察者、责任链等）<br>
+with Unity5.3.6 + UGUI + EasyTouch + DOTween<br><br>
 
 
 ![手游截图](https://github.com/LetitiaChan/DungeonFighter/blob/master/ReadMeFolder/S80408-01.jpg "title")
