@@ -30,18 +30,22 @@ namespace View
 
         public void DisplayFBInfo()
         {
-            if (Ctrl_LevelTwoScenes.Instance)
+            if (goFBInfoPanel)
             {
-                txtKill_king.text = "X" + Ctrl_LevelTwoScenes.Instance.KillNum_king;
-                txtKill_archer.text = "X" + Ctrl_LevelTwoScenes.Instance.KillNum_archer;
-                txtKill_mage.text = "X" + Ctrl_LevelTwoScenes.Instance.KillNum_mage;
-                txtKill_warrior.text = "X" + Ctrl_LevelTwoScenes.Instance.KillNum_warrior;
-                txtAward_coin.text = "X" + Ctrl_LevelTwoScenes.Instance.AwardNum_coin;
-                txtAward_exp.text = "X" + Ctrl_LevelTwoScenes.Instance.AwardNum_exp;
-                SetLevel(Ctrl_LevelTwoScenes.Instance.FBLevel);
+                goFBInfoPanel.SetActive(true);
+                goFBInfoPanel.transform.SetAsLastSibling();
+
+                if (Ctrl_LevelTwoScenes.Instance && txtKill_king)
+                {
+                    txtKill_king.text = "X" + Ctrl_LevelTwoScenes.Instance.KillNum_king;
+                    txtKill_archer.text = "X" + Ctrl_LevelTwoScenes.Instance.KillNum_archer;
+                    txtKill_mage.text = "X" + Ctrl_LevelTwoScenes.Instance.KillNum_mage;
+                    txtKill_warrior.text = "X" + Ctrl_LevelTwoScenes.Instance.KillNum_warrior;
+                    txtAward_coin.text = "X" + Ctrl_LevelTwoScenes.Instance.AwardNum_coin;
+                    txtAward_exp.text = "X" + Ctrl_LevelTwoScenes.Instance.AwardNum_exp;
+                    SetLevel(Ctrl_LevelTwoScenes.Instance.FBLevel);
+                }
             }
-            goFBInfoPanel.SetActive(true);
-            goFBInfoPanel.transform.SetAsLastSibling();
         }
         public void HideFBInfo()
         {
@@ -50,17 +54,18 @@ namespace View
 
         private void SetLevel(int level)
         {
-            if (spLevels[level])
+            if (ImgLevel)
             {
-                ImgLevel.gameObject.SetActive(true);
-                ImgLevel.sprite = spLevels[level];
-                ImgLevel.SetNativeSize();
-                ImgLevel.transform.localScale = new Vector3(3, 3, 3);
-                ImgLevel.transform.DOScale(new Vector3(2, 2, 2), 0.5f);
-            }
-            else
-            {
-                ImgLevel.gameObject.SetActive(false);
+                if (spLevels[level])
+                {
+                    ImgLevel.gameObject.SetActive(true);
+                    ImgLevel.sprite = spLevels[level];
+                    ImgLevel.SetNativeSize();
+                    ImgLevel.transform.localScale = new Vector3(3, 3, 3);
+                    ImgLevel.transform.DOScale(new Vector3(2, 2, 2), 0.5f);
+                }
+                else
+                    ImgLevel.gameObject.SetActive(false);
             }
         }
 
