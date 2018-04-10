@@ -39,7 +39,7 @@ Unity5.3.6 + UGUI + EasyTouch + DOTween
 - 去除多余的场景资源、烟雾等特效
 
 
-###手游截图
+### 手游截图
 
 ![手游截图](https://github.com/LetitiaChan/DungeonFighter/blob/master/ReadMeFolder/S80408-01.jpg "手游截图")
 ![手游截图](https://github.com/LetitiaChan/DungeonFighter/blob/master/ReadMeFolder/S80408-02.jpg "手游截图")
