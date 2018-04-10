@@ -51,7 +51,7 @@ namespace Control
             bool result = DialogDataMgr.GetInstance().LoadAllDialogData(dialogsDataArray);
             if (!result)
             {
-                DebugConsole.Log(GetType() + "/ScenesPreProgressing_LevelOne()/‘对话数据管理器’加载数据失败");
+                //DebugConsole.Log(GetType() + "/ScenesPreProgressing_LevelOne()/‘对话数据管理器’加载数据失败");
             }
         }
 
