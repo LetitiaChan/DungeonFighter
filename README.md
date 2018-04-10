@@ -1,7 +1,7 @@
 # DungeonFighter
 DungeonFighter，APRG Mobile Game.<br>
-MVC架构，对象缓冲池，小物件层消隐，手动遮挡剔除。<br>
-常用设计模式应用（观察者、责任链等）<br>
+系统主要包含战斗系统，背包，任务，新手引导，商城，副本BOSS， 日志系统等<br>
+包含五个场景，登录场景、创角场景、新手引导及战斗场景、主城场景、副本场景<br>MVC分层架构搭建，对象缓冲池技术，层消隐，手动遮挡剔除等<br>简单设计模式应用（如观察者模式、责任链模式等）<br>
 with Unity5.3.6 + UGUI + EasyTouch + DOTween<br><br>
 
 

@@ -17,5 +17,3 @@ EditorBuildSettings:
     path: Assets/Scenes/4_MajorScene.unity
   - enabled: 1
     path: Assets/Scenes/5_LevelTwo.unity
-  - enabled: 0
-    path: Assets/Scenes/100_TestScene.unity
